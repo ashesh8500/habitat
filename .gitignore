@@ -1,0 +1,17 @@
+# Model checkpoints (large files)
+*.pt
+checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Output
+output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
