@@ -71,24 +71,41 @@ All metrics measured on HM3D scene `00800-TEEsavR23oF` — a 398 m² furnished r
 
 ## Setup
 
-Two isolated Python environments resolve dependency conflicts between habitat-sim's native C++ bindings and the ML stack:
+**One-time bootstrap:**
+
+```bash
+bash scripts/setup.sh
+```
+
+This creates both environments (conda for habitat-sim, uv for ML models), downloads Depth Pro, and sets up symlinks.
+
+Two isolated Python environments resolve native dependency conflicts:
 
 | Environment | Python | Manager | Purpose |
 |---|---|---|---|
-| `habitat-sim` | 3.9 | conda | 3D rendering — habitat-sim 0.3.3, Magnum, numpy < 2 |
+| `habitat-sim` | 3.9 | conda | 3D rendering — habitat-sim 0.3.3 |
 | `.venv` | 3.12 | uv | ML models — PyTorch 2.11, YOLO-World, Depth Pro, FastSAM |
 
+**Pipeline stages:**
+
 ```bash
-# Full pipeline
-bash run_pipeline.sh
-
-# Individual stages
+# Stage 1 — Trajectory (conda: habitat-sim requires native C++ bindings)
 conda run -n habitat-sim python scripts/collect_trajectory.py \
-  --scene data/hm3d/minival/00800-TEEsavR23oF/TEEsavR23oF.basis.glb --frames 25
+  --scene data/hm3d/minival/00800-TEEsavR23oF/TEEsavR23oF.basis.glb
 
-source .venv/bin/activate
-python scripts/detect_objects.py --confidence 0.15
-python scripts/analyze_scene.py --max-frames 5
+# Stage 2 — Detection (uv: ML models)
+uv run python scripts/detect_objects.py
+
+# Stage 3 — Depth + Segmentation + Analysis
+uv run python scripts/analyze_scene.py
+```
+
+**HM3D data** requires a Matterport API token:
+
+```bash
+conda run -n habitat-sim python -m habitat_sim.utils.datasets_download \
+  --username <token-id> --password <token-secret> \
+  --uids hm3d_minival_v0.2 --data-path data/
 ```
 
 ---

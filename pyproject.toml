@@ -1,7 +1,15 @@
 [project]
-name = "habitat"
+name = "habitat-spatial-reasoning"
 version = "0.1.0"
-description = "Add your description here"
+description = "3-stage egocentric perception pipeline on HM3D photorealistic scenes"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "torch>=2.11.0",
+    "torchvision>=0.26.0",
+    "ultralytics>=8.4.0",
+    "opencv-python>=4.11.0",
+    "numpy>=1.26,<2",
+    "pillow>=10.4.0",
+    "timm>=1.0.0",
+]
