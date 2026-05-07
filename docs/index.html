@@ -1,202 +1,131 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Habitat Spatial Reasoning Pipeline</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/index.min.css">
 <style>
-  @font-face {
-    font-family: 'Computer Modern';
-    src: url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-400-normal.woff2') format('woff2');
-    font-weight: 400;
-  }
-  @font-face {
-    font-family: 'Computer Modern';
-    src: url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-700-normal.woff2') format('woff2');
-    font-weight: 700;
-  }
-  @font-face {
-    font-family: 'Computer Modern';
-    src: url('https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-400-italic.woff2') format('woff2');
-    font-weight: 400;
-    font-style: italic;
-  }
+  @font-face{font-family:'CMU Serif';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-400-normal.woff2) format('woff2');font-weight:400}
+  @font-face{font-family:'CMU Serif';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-700-normal.woff2) format('woff2');font-weight:700}
+  @font-face{font-family:'CMU Serif';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-400-italic.woff2) format('woff2');font-weight:400;font-style:italic}
+  @font-face{font-family:'CMU Typewriter';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-typewriter-400-normal.woff2) format('woff2');font-weight:400}
 
-  :root {
-    --bg: #faf8f5;
-    --surface: #f0ede8;
-    --border: #d4cfc4;
-    --border-subtle: #e3ded5;
-    --text: #1a1a1a;
-    --text-secondary: #4a4a4a;
-    --text-tertiary: #8a8a8a;
-    --accent: #2563eb;
-    --code-bg: #f0ede8;
-  }
-
-  [data-theme="dark"] {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --border: #30363d;
-    --border-subtle: #21262d;
-    --text: #c9d1d9;
-    --text-secondary: #8b949e;
-    --text-tertiary: #484f58;
-    --accent: #58a6ff;
-    --code-bg: #161b22;
-  }
-
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  html{font-size:17px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{font-size:11pt}
   body{
-    font-family: 'Computer Modern', 'Latin Modern', 'CMU Serif', Georgia, 'Times New Roman', serif;
-    background: var(--bg); color: var(--text);
-    line-height: 1.55; -webkit-font-smoothing: antialiased;
-    transition: background 0.3s, color 0.3s;
+    font-family:'CMU Serif','Latin Modern Roman',Georgia,'Times New Roman',serif;
+    background:#faf8f5;color:#1a1a1a;line-height:1.5;
+    max-width:36em;margin:0 auto;padding:3em 1.5em 6em;
   }
 
-  /* Theme toggle */
-  .theme-toggle{
-    position:fixed;top:1rem;right:1.5rem;z-index:10;
-    background:var(--surface);border:1px solid var(--border);border-radius:6px;
-    padding:0.35rem 0.6rem;cursor:pointer;font-size:0.85rem;
-    color:var(--text-secondary);font-family:inherit;transition:all 0.2s;
-  }
-  .theme-toggle:hover{color:var(--text);border-color:var(--text-tertiary)}
+  h1{font-size:1.4em;font-weight:400;margin:0 0 .15em}
+  h2{font-size:1.1em;font-weight:400;margin:2.2em 0 .5em;padding-top:1em;border-top:.5pt solid #ccc}
+  h3{font-size:1em;font-weight:400;margin:1.5em 0 .4em}
+  p{margin:0 0 .85em;text-align:justify;hyphens:auto}
+  .subtitle{font-style:italic;margin-bottom:.15em}
+  .meta{font-size:.85em;color:#777;margin-bottom:2.5em}
 
-  article{max-width:700px;margin:0 auto;padding:3rem 2rem 5rem}
-
-  h1{font-size:1.55rem;font-weight:400;margin-bottom:0.15rem;line-height:1.25}
-  h2{font-size:1.15rem;font-weight:400;margin:2.8rem 0 0.75rem;padding-top:1.3rem;border-top:0.5px solid var(--border)}
-  h3{font-size:1rem;font-weight:400;color:var(--text);margin:2rem 0 0.5rem}
-
-  p{margin-bottom:0.95rem;color:var(--text-secondary)}
-  .subtitle{color:var(--text-secondary);margin-bottom:0.15rem;font-style:italic}
-  .meta{color:var(--text-tertiary);font-size:0.85rem;margin-bottom:2.8rem}
-
-  a{color:var(--accent);text-decoration:none}
+  a{color:#2563eb;text-decoration:none}
   a:hover{text-decoration:underline}
 
-  code,.mono{font-family:'Computer Modern Typewriter','Latin Modern Mono','CMU Typewriter',monospace;font-size:0.9em;color:var(--accent)}
-  pre{
-    background:var(--code-bg);border:0.5px solid var(--border);border-radius:4px;
-    padding:0.9rem 1.1rem;overflow-x:auto;font-size:0.78rem;line-height:1.55;margin:1rem 0;
-    font-family:'Computer Modern Typewriter','Latin Modern Mono','CMU Typewriter',monospace;
-  }
-  pre code{color:var(--text);font-size:inherit}
+  code,.mono{font-family:'CMU Typewriter','Latin Modern Mono','Courier New',monospace;font-size:.92em}
+  pre{background:#f0ede8;border:.5pt solid #d4cfc4;border-radius:2px;padding:.8em 1em;overflow-x:auto;font-size:.85em;line-height:1.45;margin:.8em 0;font-family:'CMU Typewriter','Latin Modern Mono',monospace}
 
-  figure{margin:2.2rem 0}
-  figure img{width:100%;display:block;border-radius:3px;border:0.5px solid var(--border)}
-  figcaption{color:var(--text-tertiary);font-size:0.82rem;margin-top:0.55rem;line-height:1.5;font-style:italic}
+  figure{margin:2em 0}
+  figure img{width:100%;display:block;border:.5pt solid #d4cfc4}
+  figcaption{font-size:.88em;color:#555;margin-top:.5em;line-height:1.45;font-style:italic}
 
-  table{width:100%;border-collapse:collapse;margin:1rem 0 1.8rem;font-size:0.88rem}
-  th{text-align:left;font-weight:400;color:var(--text-secondary);border-bottom:0.5px solid var(--border);padding:0.4rem 0.5rem 0.45rem;font-size:0.78rem}
-  td{padding:0.35rem 0.5rem;border-bottom:0.5px solid var(--border-subtle)}
-  td.num{font-family:'Computer Modern Typewriter','Latin Modern Mono',monospace;color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:.8em 0 1.5em;font-size:.92em}
+  th{text-align:left;font-weight:400;border-bottom:.5pt solid #999;padding:.35em .4em .4em;font-size:.85em;color:#555}
+  td{padding:.3em .4em;border-bottom:.5pt solid #e3ded5}
+  td.n{font-family:'CMU Typewriter','Latin Modern Mono',monospace;color:#2563eb}
 
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);margin:2rem 0;border:0.5px solid var(--border);border-radius:4px;overflow:hidden}
-  .stat{padding:1.1rem 0.7rem;text-align:center;border-right:0.5px solid var(--border);background:var(--surface)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);margin:1.5em 0;border:.5pt solid #d4cfc4}
+  .stat{padding:.9em .5em;text-align:center;border-right:.5pt solid #d4cfc4;background:#f0ede8}
   .stat:last-child{border-right:none}
-  .stat .val{font-size:1.4rem;color:var(--text);font-weight:400;line-height:1.1}
-  .stat .lbl{font-size:0.72rem;color:var(--text-tertiary);margin-top:0.3rem}
+  .stat .v{font-size:1.3em;line-height:1.1}
+  .stat .l{font-size:.75em;color:#888;margin-top:.25em}
 
-  .class-list{font-family:'Computer Modern Typewriter','Latin Modern Mono',monospace;font-size:0.8rem;color:var(--text-secondary);line-height:1.9;columns:3;column-gap:1.5rem;margin:0.8rem 0 1.5rem}
-
-  .refs{font-size:0.85rem;color:var(--text-secondary);line-height:2;margin-top:2.8rem;padding-top:1.3rem;border-top:0.5px solid var(--border)}
-
-  @media(max-width:600px){
-    article{padding:2rem 1rem 3rem}
-    h1{font-size:1.3rem}
-    .stats{grid-template-columns:repeat(2,1fr)}
-    .class-list{columns:2}
-  }
+  .class-list{font-family:'CMU Typewriter','Latin Modern Mono',monospace;font-size:.85em;line-height:1.85;columns:3;column-gap:1.2em;margin:.5em 0 1em}
+  .refs{font-size:.9em;line-height:2;margin-top:2.5em;padding-top:1em;border-top:.5pt solid #ccc;color:#555}
 </style>
 </head>
 <body>
-
-<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">☀ light</button>
-
-<article>
 
 <h1>Habitat Spatial Reasoning Pipeline</h1>
 <p class="subtitle">End-to-end egocentric perception on HM3D photorealistic scenes.</p>
 <p class="meta">NYU WIRELESS · Prof. Sundeep Rangan · Summer 2026 · Track 2: Spatial Reasoning</p>
 
 <figure>
-  <img src="assets/architecture.svg" alt="Pipeline architecture">
-  <figcaption><strong>Figure 1.</strong> Three-stage pipeline architecture. HM3D scene data flows through trajectory collection (habitat-sim), object detection (YOLO-World v2), and combined depth estimation with segmentation (Depth Pro + FastSAM). Each stage interfaces via standard JPEG/JSON artifacts.</figcaption>
+  <img src="assets/architecture.svg" alt="Pipeline architecture diagram">
 </figure>
 
 <div class="stats">
-  <div class="stat"><div class="val">26</div><div class="lbl">frames</div></div>
-  <div class="stat"><div class="val">340</div><div class="lbl">detections</div></div>
-  <div class="stat"><div class="val">31</div><div class="lbl">classes</div></div>
-  <div class="stat"><div class="val">1.1 – 16.1<span style="font-size:0.6em"> m</span></div><div class="lbl">depth range</div></div>
+  <div class="stat"><div class="v">26</div><div class="l">frames</div></div>
+  <div class="stat"><div class="v">340</div><div class="l">detections</div></div>
+  <div class="stat"><div class="v">31</div><div class="l">classes</div></div>
+  <div class="stat"><div class="v">1.1–16.1&thinsp;m</div><div class="l">depth range</div></div>
 </div>
 
 <figure>
   <img src="assets/pipeline_demo.jpg" alt="Pipeline demo">
-  <figcaption><strong>Figure 2.</strong> Frame 0001 from HM3D scene <code>00800-TEEsavR23oF</code>. <em>Left:</em> Original RGB frame. <em>Center:</em> Depth Pro metric depth estimation (Inferno colormap, range 1.7–12.7 m). <em>Right:</em> YOLO-World v2 detection — 23 objects across 14 classes.</figcaption>
+  <figcaption><strong>Figure 2.</strong> Frame 0001 from HM3D <code>00800-TEEsavR23oF</code>. <em>Left:</em> Original RGB. <em>Center:</em> Depth Pro metric depth (Inferno, range 1.7–12.7 m). <em>Right:</em> YOLO-World v2 detection — 23 objects across 14 classes.</figcaption>
 </figure>
 
-<h2>1. Trajectory Collection</h2>
+<h2>1. Trajectory collection</h2>
 
-<p>The HM3D minival scene <code>00800-TEEsavR23oF</code> — a 398 m² furnished residential space spanning 2 floors and 7 rooms — is loaded into habitat-sim 0.3.3. An agent equipped with a pinhole RGB camera at 1.5 m eye height (90° HFOV, 640×480 resolution) navigates via navmesh-constrained waypoints. The pathfinder generates random navigable points perturbed with directional walk heuristics, covering 16.6 m × 7.7 m of walkable area. 26 frames are captured with per-frame position vectors and quaternion rotation metadata.</p>
+<p>HM3D minival scene <code>00800-TEEsavR23oF</code> (398 m², 2 floors, 7 rooms, furnished) is loaded into habitat-sim 0.3.3. An agent equipped with a pinhole RGB camera at 1.5 m eye height (90° HFOV, 640 × 480 resolution) navigates via navmesh-constrained waypoints using directional walk heuristics, covering 16.6 m × 7.7 m of walkable area. 26 frames are captured with per-frame position vectors and quaternion rotation metadata.</p>
 
 <figure>
   <img src="assets/trajectory_walkthrough.gif" alt="Trajectory animation">
-  <figcaption><strong>Figure 3.</strong> 26-frame navmesh-constrained walkthrough. The agent orients toward the next waypoint via quaternion rotation, producing realistic first-person views as it moves through the furnished residential interior.</figcaption>
+  <figcaption><strong>Figure 3.</strong> 26-frame navmesh-constrained walkthrough. The agent orients toward the next waypoint, producing first-person views while moving through the furnished residential interior.</figcaption>
 </figure>
 
-<h2>2. Object Detection</h2>
+<h2>2. Object detection</h2>
 
-<p>YOLO-World v2 (<code>yolov8s-worldv2.pt</code>, 24.7 MB) operates in open-vocabulary mode — objects are specified by natural language prompts mapped through a CLIP text encoder, requiring no retraining for novel categories. Our vocabulary spans 41 indoor object classes at a confidence threshold of 0.15.</p>
-
-<p>The detector identified 340 objects across 26 frames (13.1 per frame on average), recognizing 31 unique classes:</p>
+<p>YOLO-World v2 (<code>yolov8s-worldv2.pt</code>, 24.7 MB) operates in open-vocabulary mode: objects are specified by natural language prompts mapped through a CLIP text encoder, requiring no retraining for novel categories. The vocabulary spans 41 indoor classes at a confidence threshold of 0.15. The detector identified 340 objects across the 26 frames (13.1 per frame on average), recognizing 31 unique classes:</p>
 
 <div class="class-list">
-  cabinet<br>ceiling<br>wall<br>couch<br>pillow<br>floor<br>window<br>chair<br>lamp<br>mirror<br>rug<br>door<br>sofa<br>table<br>curtain<br>desk<br>oven<br>picture<br>plant<br>refrigerator<br>sink<br>television<br>clock<br>book<br>bag<br>bottle<br>bowl<br>bed<br>person<br>tv<br>vase
+cabinet&ensp;·&ensp;ceiling&ensp;·&ensp;wall&ensp;·&ensp;couch&ensp;·&ensp;pillow&ensp;·&ensp;floor&ensp;·&ensp;window&ensp;·&ensp;chair&ensp;·&ensp;lamp&ensp;·&ensp;mirror&ensp;·&ensp;rug&ensp;·&ensp;door&ensp;·&ensp;sofa&ensp;·&ensp;table&ensp;·&ensp;curtain&ensp;·&ensp;desk&ensp;·&ensp;oven&ensp;·&ensp;picture&ensp;·&ensp;plant&ensp;·&ensp;refrigerator&ensp;·&ensp;sink&ensp;·&ensp;television&ensp;·&ensp;clock&ensp;·&ensp;book&ensp;·&ensp;bag&ensp;·&ensp;bottle&ensp;·&ensp;bowl&ensp;·&ensp;bed&ensp;·&ensp;person&ensp;·&ensp;tv&ensp;·&ensp;vase
 </div>
 
-<h2>3. Depth Estimation and Segmentation</h2>
+<h2>3. Depth estimation and segmentation</h2>
 
-<p>Depth Pro (Apple, 2024) estimates metric depth from a single RGB frame — no stereo pair or LiDAR input required. The 1.8 GB ViT-based model outputs pixel-level depth in meters. FastSAM provides lightweight instance segmentation from YOLO-World bounding box prompts; predicted masks are resized from FastSAM's internal 640 px resolution to the original frame dimensions via nearest-neighbor interpolation.</p>
+<p>Depth Pro (Apple, 2024) estimates metric depth from a single RGB frame — no stereo pair or LiDAR required. The 1.8 GB ViT-based model outputs pixel-level depth in meters. FastSAM instances segment each YOLO-World detection from bounding box prompts; predicted masks are resized from the internal 640 px resolution to the original frame dimensions via nearest-neighbor interpolation. Per-object depth statistics (μ, σ, min, max, and pixel count) are computed from the intersection of the segmentation mask with the depth map.</p>
 
-<h3>Per-object depth analysis — Frame 0000</h3>
+<h3>Per-object depth — Frame 0000</h3>
 
 <table>
-  <thead><tr><th>Object</th><th>Conf.</th><th>Mean depth</th><th>σ</th><th>Range</th><th>Mask pixels</th></tr></thead>
-  <tr><td>couch</td><td class="num">0.86</td><td class="num">3.11 m</td><td>0.41</td><td>[2.28, 4.64] m</td><td class="num">36,527</td></tr>
-  <tr><td>ceiling</td><td class="num">0.50</td><td class="num">3.92 m</td><td>0.56</td><td>[2.35, 6.11] m</td><td class="num">67,403</td></tr>
-  <tr><td>sofa</td><td class="num">0.44</td><td class="num">4.59 m</td><td>0.36</td><td>[3.54, 5.69] m</td><td class="num">2,676</td></tr>
-  <tr><td>chair</td><td class="num">0.33</td><td class="num">6.79 m</td><td>0.68</td><td>[5.43, 8.56] m</td><td class="num">1,051</td></tr>
-  <tr><td>floor</td><td class="num">0.35</td><td class="num">4.39 m</td><td>2.10</td><td>[2.95, 14.66] m</td><td class="num">14,646</td></tr>
+  <tr><th>Object</th><th>Conf.</th><th>μ depth</th><th>σ</th><th>Range</th><th>Pixels</th></tr>
+  <tr><td>couch</td><td class="n">0.86</td><td class="n">3.11 m</td><td>0.41</td><td>[2.28, 4.64]</td><td class="n">36,527</td></tr>
+  <tr><td>ceiling</td><td class="n">0.50</td><td class="n">3.92 m</td><td>0.56</td><td>[2.35, 6.11]</td><td class="n">67,403</td></tr>
+  <tr><td>sofa</td><td class="n">0.44</td><td class="n">4.59 m</td><td>0.36</td><td>[3.54, 5.69]</td><td class="n">2,676</td></tr>
+  <tr><td>chair</td><td class="n">0.33</td><td class="n">6.79 m</td><td>0.68</td><td>[5.43, 8.56]</td><td class="n">1,051</td></tr>
+  <tr><td>floor</td><td class="n">0.35</td><td class="n">4.39 m</td><td>2.10</td><td>[2.95, 14.66]</td><td class="n">14,646</td></tr>
 </table>
 
 <h3>Depth ranges by frame</h3>
 
 <table>
-  <thead><tr><th>Frame</th><th>Min</th><th>Max</th><th>Span</th><th>Notable</th></tr></thead>
-  <tr><td>0000</td><td class="num">2.28 m</td><td class="num">16.05 m</td><td class="num">13.77 m</td><td>couch at 3.11 m, chair at 6.79 m</td></tr>
-  <tr><td>0001</td><td class="num">1.65 m</td><td class="num">12.67 m</td><td class="num">11.02 m</td><td>refrigerator at 5.39 m</td></tr>
-  <tr><td>0002</td><td class="num">2.61 m</td><td class="num">4.12 m</td><td class="num">1.51 m</td><td>narrow corridor — minimal depth variation</td></tr>
-  <tr><td>0003</td><td class="num">1.86 m</td><td class="num">8.48 m</td><td class="num">6.62 m</td><td>bedroom, open doorway visible</td></tr>
-  <tr><td>0004</td><td class="num">1.12 m</td><td class="num">9.11 m</td><td class="num">7.99 m</td><td>close to cabinet, deep sightline through room</td></tr>
+  <tr><th>Frame</th><th>Min</th><th>Max</th><th>Span</th><th>Notable</th></tr>
+  <tr><td>0000</td><td class="n">2.28 m</td><td class="n">16.05 m</td><td class="n">13.77 m</td><td>couch at 3.11 m, chair at 6.79 m</td></tr>
+  <tr><td>0001</td><td class="n">1.65 m</td><td class="n">12.67 m</td><td class="n">11.02 m</td><td>refrigerator at 5.39 m</td></tr>
+  <tr><td>0002</td><td class="n">2.61 m</td><td class="n">4.12 m</td><td class="n">1.51 m</td><td>narrow corridor, minimal variation</td></tr>
+  <tr><td>0003</td><td class="n">1.86 m</td><td class="n">8.48 m</td><td class="n">6.62 m</td><td>bedroom with open doorway</td></tr>
+  <tr><td>0004</td><td class="n">1.12 m</td><td class="n">9.11 m</td><td class="n">7.99 m</td><td>close to cabinet, deep sightline</td></tr>
 </table>
 
-<h2>4. Setup and Reproducibility</h2>
+<h2>4. Setup</h2>
 
-<p>The pipeline uses two isolated Python environments to resolve dependency conflicts between habitat-sim's native C++ bindings (which require numpy &lt; 2, Magnum, and Pillow 10.4) and the ML stack (PyTorch 2.11, numpy 1.26).</p>
+<p>The pipeline uses two isolated Python environments to resolve dependency conflicts between habitat-sim's native C++ bindings (requiring numpy &lt; 2 and Magnum) and the ML stack (PyTorch 2.11).</p>
 
 <table>
-  <thead><tr><th>Environment</th><th>Python</th><th>Manager</th><th>Purpose</th></tr></thead>
-  <tr><td><code>habitat-sim</code></td><td>3.9</td><td>conda</td><td>3D rendering — habitat-sim 0.3.3, Magnum bindings</td></tr>
+  <tr><th>Environment</th><th>Python</th><th>Manager</th><th>Purpose</th></tr>
+  <tr><td><code>habitat-sim</code></td><td>3.9</td><td>conda</td><td>3D rendering — habitat-sim 0.3.3</td></tr>
   <tr><td><code>.venv</code></td><td>3.12</td><td>uv</td><td>ML models — YOLO-World, Depth Pro, FastSAM</td></tr>
 </table>
 
-<pre><code># Full pipeline
-bash run_pipeline.sh
+<pre>bash run_pipeline.sh
 
 # Individual stages
 conda run -n habitat-sim python scripts/collect_trajectory.py \
@@ -204,53 +133,34 @@ conda run -n habitat-sim python scripts/collect_trajectory.py \
 
 source .venv/bin/activate
 python scripts/detect_objects.py --confidence 0.15
-python scripts/analyze_scene.py --max-frames 5</code></pre>
+python scripts/analyze_scene.py --max-frames 5</pre>
 
-<h2>5. Design Decisions</h2>
+<h2>5. Design decisions</h2>
 
-<p><strong>Modular stage interfaces.</strong> Each stage communicates through JPEG and JSON — standard, inspectable formats that allow independent debugging, model substitution, and distributed execution. Replacing YOLO-World with DETR or Depth Pro with MiDaS affects only the relevant stage.</p>
+<p><strong>Modular stage interfaces.</strong> Each stage communicates through JPEG and JSON — standard, inspectable formats that allow independent debugging, model substitution, and distributed execution. Replacing YOLO-World with DETR or Depth Pro with MiDaS requires no changes to other stages.</p>
 
-<p><strong>Open-vocabulary detection.</strong> Object categories are specified as a natural language vocabulary via CLI argument. Changing the detection target from "chair, table, sofa" to "fire extinguisher, exit sign, wheelchair" requires no retraining — only a text prompt change.</p>
+<p><strong>Open-vocabulary detection.</strong> Object categories are specified as a natural language vocabulary via CLI argument. Changing the detection target from "chair, table, sofa" to "fire extinguisher, exit sign, wheelchair" requires no retraining.</p>
 
-<p><strong>Navmesh-constrained navigation.</strong> Waypoints are restricted to navigable regions computed from the scene's geometry. This produces realistic human-like walking patterns rather than arbitrary floating-camera trajectories through walls.</p>
+<p><strong>Navmesh-constrained navigation.</strong> Waypoints restricted to navigable regions produce realistic human-like walking patterns rather than arbitrary floating-camera trajectories through walls.</p>
 
-<p><strong>FastSAM as NanoSAM proxy.</strong> NanoSAM targets NVIDIA Jetson edge devices with TensorRT-optimized inference. FastSAM provides architecturally equivalent functionality (bounding box prompt → instance mask) through the ultralytics ecosystem with no custom build dependencies.</p>
+<p><strong>FastSAM as NanoSAM proxy.</strong> NanoSAM targets NVIDIA Jetson with TensorRT-optimized inference. FastSAM provides equivalent functionality (bounding box → instance mask) through the ultralytics ecosystem with no custom build dependencies.</p>
 
-<h2>6. Known Limitations</h2>
+<h2>6. Limitations</h2>
 
 <table>
-  <thead><tr><th>Constraint</th><th>Proposed mitigation</th></tr></thead>
-  <tr><td>Depth Pro inference at 5–10 s/frame on CPU</td><td>Batch overnight; evaluate MPS acceleration</td></tr>
-  <tr><td>FastSAM internal 640 px resize produces mask edge artifacts</td><td>Upgrade to bilinear interpolation for the resizing step</td></tr>
-  <tr><td>No temporal object identity across frames</td><td>Apply Hungarian matching with Kalman-filtered tracking</td></tr>
-  <tr><td>Textureless surfaces yield near-zero detections</td><td>Expected behavior for geometric test scenes; HM3D provides full photorealistic texture coverage</td></tr>
-  <tr><td>Thin structures (chair legs, lamp cords) below detection threshold</td><td>SAM-family models struggle with sub-10 px features; higher resolution may help</td></tr>
-  <tr><td>Monocular depth ambiguity at object boundaries</td><td>Denser trajectory sampling improves multi-view consistency</td></tr>
+  <tr><th>Constraint</th><th>Proposed mitigation</th></tr>
+  <tr><td>Depth Pro runs 5–10 s/frame on CPU</td><td>Batch overnight; evaluate MPS acceleration</td></tr>
+  <tr><td>FastSAM internal 640 px resize causes mask edge artifacts</td><td>Upgrade to bilinear interpolation</td></tr>
+  <tr><td>No temporal object identity across frames</td><td>Hungarian matching with Kalman filtering</td></tr>
+  <tr><td>Textureless surfaces yield near-zero detections</td><td>Expected for geometric test scenes; HM3D is fully textured</td></tr>
+  <tr><td>Thin structures below detection threshold</td><td>SAM-family models struggle with sub-10 px features</td></tr>
+  <tr><td>Monocular depth ambiguity at boundaries</td><td>Denser trajectory improves multi-view consistency</td></tr>
 </table>
 
 <div class="refs">
   <strong>References</strong><br>
-  <a href="https://aihabitat.org/">AI Habitat</a> · <a href="https://aihabitat.org/datasets/hm3d/">HM3D Dataset v0.2</a> · <a href="https://github.com/AILab-CVC/YOLO-World">YOLO-World</a> (CVPR 2024) · <a href="https://github.com/apple/ml-depth-pro">Depth Pro</a> (Apple, 2024) · <a href="https://github.com/NVIDIA-AI-IOT/nanosam">NanoSAM</a> · <a href="https://github.com/CASIA-IVA-Lab/FastSAM">FastSAM</a> (ICCV 2023) · <a href="https://github.com/ashesh8500/habitat">Source code</a>
+  <a href="https://aihabitat.org/">AI Habitat</a> · <a href="https://aihabitat.org/datasets/hm3d/">HM3D v0.2</a> · <a href="https://github.com/AILab-CVC/YOLO-World">YOLO-World</a> (CVPR 2024) · <a href="https://github.com/apple/ml-depth-pro">Depth Pro</a> (Apple, 2024) · <a href="https://github.com/NVIDIA-AI-IOT/nanosam">NanoSAM</a> · <a href="https://github.com/CASIA-IVA-Lab/FastSAM">FastSAM</a> (ICCV 2023) · <a href="https://github.com/ashesh8500/habitat">Source code</a>
 </div>
 
-</article>
-
-<script>
-const html = document.documentElement;
-const btn = document.querySelector('.theme-toggle');
-
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  btn.innerHTML = t === 'dark' ? '☾ dark' : '☀ light';
-  localStorage.setItem('theme', t);
-}
-
-// Load saved or system preference
-const saved = localStorage.getItem('theme');
-if (saved) { setTheme(saved); }
-else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
-
-btn.onclick = () => setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-</script>
 </body>
 </html>

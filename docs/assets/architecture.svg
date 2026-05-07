@@ -1,64 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" style="background:#0d1117;font-family:system-ui,-apple-system,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" font-family="'Computer Modern', 'Latin Modern Roman', 'CMU Serif', Georgia, serif">
   <defs>
-    <marker id="a" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
-      <polygon points="0 0, 6 2.5, 0 5" fill="#484f58"/>
+    <marker id="arrow" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#999"/>
     </marker>
   </defs>
 
-  <!-- Process blocks -->
-  <rect x="24" y="100" width="180" height="96" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="114" y="124" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="500">Trajectory Collection</text>
-  <text x="114" y="144" text-anchor="middle" fill="#8b949e" font-size="9">habitat-sim 0.3.3</text>
-  <text x="114" y="162" text-anchor="middle" fill="#484f58" font-size="8">Navmesh waypoints</text>
-  <text x="114" y="176" text-anchor="middle" fill="#484f58" font-size="8">1.5m eye height · 640×480</text>
-  <text x="114" y="190" text-anchor="middle" fill="#484f58" font-size="8">26 frames · 90° HFOV</text>
+  <rect width="720" height="240" fill="#faf8f5"/>
 
-  <line x1="204" y1="148" x2="246" y2="148" stroke="#30363d" stroke-width="1" marker-end="url(#a)"/>
+  <!-- Stage 1 -->
+  <rect x="30" y="60" width="170" height="80" fill="none" stroke="#333" stroke-width="0.8"/>
+  <text x="115" y="82" text-anchor="middle" font-size="11">Trajectory Collection</text>
+  <text x="115" y="100" text-anchor="middle" font-size="9" fill="#555">habitat-sim 0.3.3</text>
+  <text x="115" y="116" text-anchor="middle" font-size="8" fill="#888">navmesh waypoints</text>
+  <text x="115" y="130" text-anchor="middle" font-size="8" fill="#888">26 frames · 640×480</text>
 
-  <rect x="248" y="100" width="180" height="96" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="338" y="124" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="500">Object Detection</text>
-  <text x="338" y="144" text-anchor="middle" fill="#8b949e" font-size="9">YOLO-World v2</text>
-  <text x="338" y="162" text-anchor="middle" fill="#484f58" font-size="8">Open-vocabulary · 41 classes</text>
-  <text x="338" y="176" text-anchor="middle" fill="#484f58" font-size="8">CLIP text encoder</text>
-  <text x="338" y="190" text-anchor="middle" fill="#484f58" font-size="8">340 detections · 31 classes</text>
+  <line x1="200" y1="100" x2="238" y2="100" stroke="#999" stroke-width="0.7" marker-end="url(#arrow)"/>
 
-  <line x1="428" y1="148" x2="470" y2="148" stroke="#30363d" stroke-width="1" marker-end="url(#a)"/>
+  <!-- Stage 2 -->
+  <rect x="240" y="60" width="170" height="80" fill="none" stroke="#333" stroke-width="0.8"/>
+  <text x="325" y="82" text-anchor="middle" font-size="11">Object Detection</text>
+  <text x="325" y="100" text-anchor="middle" font-size="9" fill="#555">YOLO-World v2</text>
+  <text x="325" y="116" text-anchor="middle" font-size="8" fill="#888">41 classes · open-vocabulary</text>
+  <text x="325" y="130" text-anchor="middle" font-size="8" fill="#888">340 detections · 31 unique</text>
 
-  <rect x="472" y="88" width="180" height="120" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-  <text x="562" y="112" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="500">Depth + Segmentation</text>
+  <line x1="410" y1="100" x2="448" y2="100" stroke="#999" stroke-width="0.7" marker-end="url(#arrow)"/>
 
-  <rect x="484" y="126" width="72" height="32" fill="#0d1117" stroke="#21262d" stroke-width="0.5"/>
-  <text x="520" y="140" text-anchor="middle" fill="#8b949e" font-size="8">Depth Pro</text>
-  <text x="520" y="152" text-anchor="middle" fill="#484f58" font-size="7">Apple · metric</text>
+  <!-- Stage 3 -->
+  <rect x="450" y="60" width="170" height="80" fill="none" stroke="#333" stroke-width="0.8"/>
+  <text x="535" y="82" text-anchor="middle" font-size="11">Depth + Segmentation</text>
+  <text x="535" y="100" text-anchor="middle" font-size="9" fill="#555">Depth Pro · FastSAM</text>
+  <text x="535" y="116" text-anchor="middle" font-size="8" fill="#888">per-pixel metric depth</text>
+  <text x="535" y="130" text-anchor="middle" font-size="8" fill="#888">per-object masks + stats</text>
 
-  <rect x="566" y="126" width="72" height="32" fill="#0d1117" stroke="#21262d" stroke-width="0.5"/>
-  <text x="602" y="140" text-anchor="middle" fill="#8b949e" font-size="8">FastSAM</text>
-  <text x="602" y="152" text-anchor="middle" fill="#484f58" font-size="7">segmentation</text>
+  <!-- Input label -->
+  <text x="115" y="52" text-anchor="middle" font-size="8" fill="#888">HM3D 00800-TEEsavR23oF</text>
+  <line x1="115" y1="55" x2="115" y2="58" stroke="#ccc" stroke-width="0.5"/>
 
-  <text x="562" y="182" text-anchor="middle" fill="#484f58" font-size="8">Pixel-level depth · per-object masks</text>
-  <text x="562" y="196" text-anchor="middle" fill="#484f58" font-size="8">μ · σ · min · max · mask area</text>
+  <!-- Output labels -->
+  <line x1="115" y1="140" x2="115" y2="168" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="115" y="180" text-anchor="middle" font-size="8" fill="#888">26 JPEG frames</text>
 
-  <!-- Scene input -->
-  <rect x="24" y="56" width="180" height="28" fill="#0d1117" stroke="#21262d" stroke-width="0.5"/>
-  <text x="114" y="74" text-anchor="middle" fill="#8b949e" font-size="9">HM3D 00800-TEEsavR23oF</text>
+  <line x1="325" y1="140" x2="325" y2="168" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="325" y="180" text-anchor="middle" font-size="8" fill="#888">detections.json</text>
 
-  <line x1="114" y1="84" x2="114" y2="98" stroke="#21262d" stroke-width="0.5"/>
-
-  <!-- Output artifacts -->
-  <rect x="60" y="232" width="108" height="24" rx="3" fill="#0d1117" stroke="#21262d" stroke-width="0.5"/>
-  <text x="114" y="247" text-anchor="middle" fill="#484f58" font-size="8">26 JPEG frames</text>
-
-  <rect x="284" y="232" width="108" height="24" rx="3" fill="#0d1117" stroke="#21262d" stroke-width="0.5"/>
-  <text x="338" y="247" text-anchor="middle" fill="#484f58" font-size="8">detections.json</text>
-
-  <rect x="508" y="244" width="108" height="24" rx="3" fill="#0d1117" stroke="#21262d" stroke-width="0.5"/>
-  <text x="562" y="259" text-anchor="middle" fill="#484f58" font-size="8">analysis.json</text>
-
-  <!-- Dashed lines to outputs -->
-  <line x1="114" y1="196" x2="114" y2="230" stroke="#21262d" stroke-width="0.5" stroke-dasharray="2,3"/>
-  <line x1="338" y1="196" x2="338" y2="230" stroke="#21262d" stroke-width="0.5" stroke-dasharray="2,3"/>
-  <line x1="562" y1="208" x2="562" y2="242" stroke="#21262d" stroke-width="0.5" stroke-dasharray="2,3"/>
+  <line x1="535" y1="140" x2="535" y2="168" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="535" y="180" text-anchor="middle" font-size="8" fill="#888">analysis.json</text>
 
   <!-- Title -->
-  <text x="400" y="28" text-anchor="middle" fill="#c9d1d9" font-size="13" font-weight="600">Habitat Spatial Reasoning Pipeline</text>
+  <text x="360" y="28" text-anchor="middle" font-size="13" fill="#222">Habitat Spatial Reasoning Pipeline</text>
+
+  <!-- Caption -->
+  <text x="360" y="222" text-anchor="middle" font-size="8.5" fill="#666" font-style="italic">Figure 1: Three-stage pipeline architecture. Each stage reads and writes standard JPEG/JSON artifacts, enabling independent execution and model substitution.</text>
 </svg>
