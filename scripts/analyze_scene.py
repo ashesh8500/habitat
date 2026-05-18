@@ -25,7 +25,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -50,20 +50,29 @@ except ImportError:
     print("  Install: pip install ultralytics")
 
 # ── Defaults ───────────────────────────────────────────────────────
-DEPTH_PRO_MODEL_DIR = Path("/tmp/ml-depth-pro/checkpoints")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEPTH_PRO_MODEL_CANDIDATES = [
+    REPO_ROOT / "checkpoints" / "depth_pro.pt",
+    Path("/tmp/ml-depth-pro/checkpoints/depth_pro.pt"),
+]
 
 
 def load_depth_model(device: str = "cpu") -> Tuple:
     """Load Depth Pro model."""
     if not HAS_DEPTH_PRO:
         raise RuntimeError("depth_pro not installed")
-    model_path = DEPTH_PRO_MODEL_DIR / "depth_pro.pt"
-    if not model_path.exists():
+
+    env_path = os.environ.get("DEPTH_PRO_MODEL")
+    candidates = [Path(env_path)] if env_path else []
+    candidates.extend(DEPTH_PRO_MODEL_CANDIDATES)
+    model_path = next((path for path in candidates if path.exists()), None)
+    if model_path is None:
         raise FileNotFoundError(
-            f"Depth Pro model not found at {model_path}. "
-            f"Run: cd /tmp/ml-depth-pro && bash get_pretrained_models.sh"
+            "Depth Pro model not found. Checked: %s. "
+            "Run: cd /tmp/ml-depth-pro && bash get_pretrained_models.sh"
+            % ", ".join(str(path) for path in candidates)
         )
-    os.environ.setdefault("DEPTH_PRO_CHECKPOINT_PATH", str(model_path.parent))
+    os.environ["DEPTH_PRO_CHECKPOINT_PATH"] = str(model_path.parent)
     model, transform = create_model_and_transforms(
         device=torch.device(device),
         precision=torch.float32,
@@ -85,10 +94,30 @@ def load_sam_model(device: str = "cpu") -> SAM:
         # Fallback to standard SAM
         model = SAM("sam_b.pt")
         print("  Using SAM-b (standard)")
+    if device != "cpu" and hasattr(model, "to"):
+        try:
+            model.to(device)
+        except Exception as exc:
+            print(f"  WARNING: Could not move SAM model to {device}: {exc}")
     return model
 
 
-def estimate_depth(model, transform, image_bgr: np.ndarray) -> np.ndarray:
+def _to_device(value: Any, device: str) -> Any:
+    """Recursively move torch tensors to the requested device."""
+    if device == "cpu":
+        return value
+    if torch.is_tensor(value):
+        return value.to(device)
+    if isinstance(value, dict):
+        return {k: _to_device(v, device) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_to_device(v, device) for v in value]
+    if isinstance(value, tuple):
+        return tuple(_to_device(v, device) for v in value)
+    return value
+
+
+def estimate_depth(model, transform, image_bgr: np.ndarray, device: str = "cpu") -> np.ndarray:
     """Run Depth Pro on a single image.
     
     Args:
@@ -101,7 +130,7 @@ def estimate_depth(model, transform, image_bgr: np.ndarray) -> np.ndarray:
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
     
     # Transform and predict
-    transformed = transform(image_rgb)
+    transformed = _to_device(transform(image_rgb), device)
     with torch.no_grad():
         prediction = model.infer(transformed, f_px=None)
     
@@ -109,8 +138,8 @@ def estimate_depth(model, transform, image_bgr: np.ndarray) -> np.ndarray:
     return depth.astype(np.float32)
 
 
-def segment_objects(sam_model, image_bgr: np.ndarray, 
-                    detections: List[Dict]) -> List[Dict]:
+def segment_objects(sam_model, image_bgr: np.ndarray,
+                    detections: List[Dict], device: str = "cpu") -> List[Dict]:
     """Segment objects detected by YOLO-World using prompts from detections.
     
     Uses bounding boxes as prompts for SAM/FastSAM.
@@ -127,6 +156,7 @@ def segment_objects(sam_model, image_bgr: np.ndarray,
             sam_result = sam_model(
                 image_bgr.copy(),
                 bboxes=[det["bbox"]],
+                device=device,
                 verbose=False,
             )
         except Exception as e:
@@ -231,6 +261,10 @@ def create_visualization(image_bgr: np.ndarray, depth_map: np.ndarray,
     
     # Stack horizontally
     combined = np.hstack([image_bgr, depth_vis, annotated])
+    depth_path = output_path.parent / output_path.name.replace("analysis_", "depth_", 1)
+    spatial_path = output_path.parent / output_path.name.replace("analysis_", "spatial_", 1)
+    cv2.imwrite(str(depth_path), depth_vis)
+    cv2.imwrite(str(spatial_path), annotated)
     cv2.imwrite(str(output_path), combined)
 
 
@@ -308,7 +342,7 @@ def main():
         depth_map = None
         if depth_model is not None:
             try:
-                depth_map = estimate_depth(depth_model, depth_transform, img_bgr)
+                depth_map = estimate_depth(depth_model, depth_transform, img_bgr, args.device)
                 print(f"    Depth map: {depth_map.shape}, range [{depth_map.min():.2f}, {depth_map.max():.2f}]m")
             except Exception as e:
                 print(f"    Depth estimation failed: {e}")
@@ -317,7 +351,7 @@ def main():
         segmented = []
         if sam_model is not None and frame_dets:
             try:
-                segmented = segment_objects(sam_model, img_bgr, frame_dets)
+                segmented = segment_objects(sam_model, img_bgr, frame_dets, args.device)
                 print(f"    Segmented: {len(segmented)} objects")
             except Exception as e:
                 print(f"    Segmentation failed: {e}")

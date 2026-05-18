@@ -27,6 +27,18 @@ All metrics measured on HM3D scene `00800-TEEsavR23oF` — a 398 m² furnished r
 | Mean detections per frame | 13.1 |
 | Detection confidence threshold | 0.15 |
 
+## Live Demo
+
+Run a local browser demo that starts the real pipeline and visualizes artifacts as they are produced:
+
+```bash
+uv run python scripts/live_demo_server.py
+```
+
+Open `http://127.0.0.1:8765`, then start a run from the page. For a live interview, use 8–10 trajectory frames, 3–4 depth frames, `960x540` or `1280x720` resolution, and `mps` as the ML device on Apple Silicon so the demo stays responsive while still executing Habitat-Sim, YOLO-World, Depth Pro, and FastSAM on real HM3D data.
+
+See [`docs/interview_walkthrough.md`](docs/interview_walkthrough.md) for a suggested presentation script, decision map, and extension plan.
+
 <p align="center">
   <img src="docs/assets/pipeline_demo.jpg" alt="Pipeline demo" width="100%">
 </p>

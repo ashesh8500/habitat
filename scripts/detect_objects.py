@@ -67,14 +67,20 @@ def detect_objects(
     confidence: float = 0.25,
     iou_threshold: float = 0.45,
     max_detections: int = 50,
+    device: str = "auto",
 ) -> List[Dict]:
     """Run detection on a single frame and return structured results."""
+    predict_kwargs = {}
+    if device != "auto":
+        predict_kwargs["device"] = device
+
     results = model.predict(
         source=str(frame_path),
         conf=confidence,
         iou=iou_threshold,
         max_det=max_detections,
         verbose=False,
+        **predict_kwargs,
     )
 
     detections = []
@@ -126,6 +132,7 @@ def main():
     parser.add_argument("--vocabulary", nargs="+", help="Custom vocabulary (space-separated)")
     parser.add_argument("--confidence", type=float, default=0.25)
     parser.add_argument("--iou", type=float, default=0.45, help="IoU threshold for NMS")
+    parser.add_argument("--device", default="auto", help="Inference device: auto, cpu, mps, cuda")
     args = parser.parse_args()
 
     input_dir = Path(args.input)
@@ -137,6 +144,7 @@ def main():
 
     # Load model
     model = load_model(args.model, vocab, args.confidence)
+    print(f"  Device: {args.device}")
 
     # Scan for frame files
     frame_files = sorted(input_dir.glob("frame_*.jpg"))
@@ -155,7 +163,7 @@ def main():
     for i, frame_path in enumerate(frame_files):
         print(f"  [{i+1}/{len(frame_files)}] {frame_path.name}")
 
-        detections = detect_objects(model, frame_path, args.confidence, args.iou)
+        detections = detect_objects(model, frame_path, args.confidence, args.iou, device=args.device)
 
         # Draw and save annotated frame
         img = cv2.imread(str(frame_path))

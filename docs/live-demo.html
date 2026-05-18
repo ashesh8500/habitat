@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Habitat Pipeline Demo</title>
+<style>
+  :root{
+    --bg:#0e0f0d;
+    --panel:#171814;
+    --panel-2:#202117;
+    --line:#383a2c;
+    --text:#f4f0df;
+    --muted:#a9aa96;
+    --amber:#f3b74a;
+    --cyan:#55d6c2;
+    --green:#96d66e;
+    --red:#ff6b5f;
+    --shadow:rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(85,214,194,.1), transparent 28rem),
+      radial-gradient(circle at 100% 80%, rgba(243,183,74,.08), transparent 30rem),
+      var(--bg);
+    color:var(--text);
+    font:14px/1.45 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing:0;
+    overflow:hidden;
+  }
+  button,input,select{font:inherit}
+  button{
+    border:1px solid var(--line);
+    background:#24251c;
+    color:var(--text);
+    min-height:36px;
+    padding:0 12px;
+    cursor:pointer;
+  }
+  button:hover{border-color:var(--amber)}
+  button.primary{background:var(--amber);border-color:var(--amber);color:#16140d;font-weight:700}
+  button.danger{border-color:#63302e;color:#ffc7bf}
+  button.active{border-color:var(--cyan);color:var(--cyan)}
+  input,select{
+    width:100%;
+    min-height:34px;
+    border:1px solid var(--line);
+    background:#10110d;
+    color:var(--text);
+    padding:6px 8px;
+  }
+  label{display:grid;gap:5px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  .app{
+    height:100%;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 360px;
+    grid-template-rows:auto minmax(0,1fr) 174px;
+    gap:12px;
+    padding:12px;
+  }
+  .topbar{
+    grid-column:1 / -1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    min-height:48px;
+    border:1px solid var(--line);
+    background:rgba(23,24,20,.86);
+    box-shadow:0 12px 35px var(--shadow);
+    padding:0 14px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em}
+  .brand-mark{
+    width:28px;height:28px;border:1px solid var(--amber);
+    display:grid;place-items:center;color:var(--amber);
+    box-shadow:inset 0 0 0 2px rgba(243,183,74,.12);
+  }
+  .status-pill{
+    min-width:96px;
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:6px 10px;
+    text-align:center;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-size:12px;
+  }
+  .status-pill.running{border-color:var(--green);color:var(--green)}
+  .status-pill.error{border-color:var(--red);color:var(--red)}
+  .viewport{
+    position:relative;
+    min-width:0;
+    min-height:0;
+    border:1px solid var(--line);
+    background:#050604;
+    overflow:hidden;
+    box-shadow:0 20px 50px var(--shadow);
+  }
+  .viewport::after{
+    content:"";
+    pointer-events:none;
+    position:absolute;inset:0;
+    background:linear-gradient(rgba(255,255,255,.025) 50%, rgba(0,0,0,.03) 50%);
+    background-size:100% 4px;
+    mix-blend-mode:screen;
+    opacity:.4;
+  }
+  .viewport-header{
+    position:absolute;z-index:5;inset:14px 14px auto 14px;
+    display:flex;justify-content:space-between;gap:12px;
+    pointer-events:none;
+  }
+  .hud-box{
+    border:1px solid rgba(243,183,74,.45);
+    background:rgba(14,15,13,.72);
+    backdrop-filter:blur(8px);
+    padding:8px 10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.28);
+  }
+  .hud-box .k{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  .hud-box .v{display:block;color:var(--text);font-size:18px;font-weight:800;line-height:1.1}
+  .viewport-frame{
+    position:absolute;inset:0;
+    display:grid;place-items:center;
+  }
+  #mainImage{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    image-rendering:auto;
+  }
+  #overlay{
+    position:absolute;inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+  }
+  .empty{
+    position:absolute;inset:0;
+    display:grid;place-items:center;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.16em;
+    font-size:12px;
+  }
+  .reticle{
+    position:absolute;left:50%;top:50%;
+    width:82px;height:82px;translate:-50% -50%;
+    border:1px solid rgba(85,214,194,.5);
+    border-radius:50%;
+    pointer-events:none;
+  }
+  .reticle::before,.reticle::after{content:"";position:absolute;background:rgba(85,214,194,.65)}
+  .reticle::before{left:50%;top:-18px;width:1px;height:118px}
+  .reticle::after{top:50%;left:-18px;height:1px;width:118px}
+  .modebar{
+    position:absolute;left:14px;right:14px;bottom:14px;z-index:6;
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  }
+  .modebar .spacer{flex:1}
+  .scrubber{
+    flex:1 1 240px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    padding:0 8px;
+    border:1px solid rgba(56,58,44,.9);
+    background:rgba(14,15,13,.76);
+  }
+  .tick{
+    height:18px;
+    flex:1;
+    min-width:4px;
+    border:0;
+    padding:0;
+    background:#37372b;
+  }
+  .tick.has-rgb{background:#6c6846}
+  .tick.has-det{background:#8b7a39}
+  .tick.has-analysis{background:var(--cyan)}
+  .tick.current{outline:2px solid var(--text);outline-offset:2px}
+  .side{
+    min-height:0;
+    display:grid;
+    grid-template-rows:auto auto minmax(0,1fr);
+    gap:12px;
+    overflow:auto;
+    scrollbar-color:var(--line) transparent;
+  }
+  .side::-webkit-scrollbar{width:8px}
+  .side::-webkit-scrollbar-track{background:transparent}
+  .side::-webkit-scrollbar-thumb{background:var(--line)}
+  .panel{
+    border:1px solid var(--line);
+    background:rgba(23,24,20,.9);
+    box-shadow:0 14px 35px var(--shadow);
+  }
+  .panel-head{
+    display:flex;align-items:center;justify-content:space-between;
+    min-height:38px;
+    padding:0 12px;
+    border-bottom:1px solid var(--line);
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-size:12px;
+  }
+  .panel-body{padding:12px}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .controls label.scene{grid-column:1 / -1}
+  .actions{grid-column:1 / -1;display:grid;grid-template-columns:1fr auto;gap:8px}
+  .stages{display:grid;grid-template-columns:1fr;gap:8px}
+  .stage{
+    display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;
+    padding:8px 9px;
+    background:#11120e;
+    border:1px solid #2c2e22;
+  }
+  .stage .dot{width:12px;height:12px;border:1px solid var(--line);justify-self:center}
+  .stage.done .dot{background:var(--green);border-color:var(--green)}
+  .stage.running .dot{background:var(--amber);border-color:var(--amber);animation:pulse 1s infinite}
+  .stage.error .dot{background:var(--red);border-color:var(--red)}
+  .stage .name{font-weight:700}
+  .stage .state{color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.08em}
+  .intel{
+    min-height:0;
+    display:grid;
+    grid-template-rows:180px minmax(0,1fr);
+  }
+  .map-wrap{position:relative;border-bottom:1px solid var(--line);background:#10110d}
+  #miniMap{width:100%;height:100%;display:block}
+  .objects{min-height:0;overflow:auto}
+  .object-row{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px;
+    padding:9px 12px;
+    border-bottom:1px solid #292b20;
+  }
+  .object-row b{font-size:13px}
+  .object-row span{color:var(--muted);font-variant-numeric:tabular-nums}
+  .log{
+    grid-column:1 / -1;
+    min-height:0;
+    border:1px solid var(--line);
+    background:#090a08;
+    display:grid;
+    grid-template-columns:1fr 360px;
+  }
+  .console{
+    margin:0;
+    padding:12px;
+    overflow:auto;
+    white-space:pre-wrap;
+    color:#d4d0bb;
+    font:12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .metrics{
+    border-left:1px solid var(--line);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:repeat(3,1fr);
+  }
+  .metric{min-height:0;padding:9px 12px;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+  .metric:nth-child(2n){border-right:0}
+  .metric .value{display:block;font-size:21px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums;line-height:1.05}
+  .metric .label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  @keyframes pulse{50%{opacity:.35}}
+  @media (max-width:980px){
+    body{overflow:auto}
+    .app{height:auto;min-height:100%;grid-template-columns:1fr;grid-template-rows:auto 62vh auto 220px}
+    .side{grid-template-rows:auto auto 420px}
+    .log{grid-template-columns:1fr}
+    .metrics{border-left:0;border-top:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">H</span><span>Habitat Live Pipeline</span></div>
+    <div class="status-pill" id="runStatus">Idle</div>
+  </header>
+
+  <section class="viewport">
+    <div class="viewport-header">
+      <div class="hud-box"><span class="k">Frame</span><span class="v" id="frameReadout">--</span></div>
+      <div class="hud-box"><span class="k">Mode</span><span class="v" id="modeReadout">RGB</span></div>
+    </div>
+    <div class="viewport-frame">
+      <img id="mainImage" alt="">
+      <canvas id="overlay"></canvas>
+      <div class="empty" id="emptyState">No active run</div>
+      <div class="reticle"></div>
+    </div>
+    <div class="modebar">
+      <button type="button" data-mode="rgb" class="active">RGB</button>
+      <button type="button" data-mode="detection">YOLO</button>
+      <button type="button" data-mode="analysis">Depth</button>
+      <button type="button" id="autoplay" class="active">Auto</button>
+      <div class="scrubber" id="scrubber"></div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <section class="panel">
+      <div class="panel-head"><span>Run Config</span><span id="runId">local</span></div>
+      <div class="panel-body">
+        <div class="controls">
+          <label class="scene">Scene
+            <input id="scene" value="data/hm3d/minival/00800-TEEsavR23oF/TEEsavR23oF.basis.glb">
+          </label>
+          <label>Frames
+            <input id="frames" type="number" min="1" max="80" value="10">
+          </label>
+          <label>Depth frames
+            <input id="analysisFrames" type="number" min="1" max="80" value="4">
+          </label>
+          <label>Resolution
+            <select id="resolution">
+              <option value="640x480">640x480 fast</option>
+              <option value="960x540" selected>960x540 sharp</option>
+              <option value="1280x720">1280x720 presentation</option>
+            </select>
+          </label>
+          <label>Confidence
+            <input id="confidence" type="number" min="0.01" max="0.95" step="0.01" value="0.15">
+          </label>
+          <label>ML device
+            <select id="device">
+              <option value="cpu">cpu</option>
+              <option value="mps" selected>mps</option>
+              <option value="cuda">cuda</option>
+            </select>
+          </label>
+          <div class="actions">
+            <button type="button" class="primary" id="startRun">Start Run</button>
+            <button type="button" class="danger" id="stopRun">Stop</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><span>Stages</span><span id="stageName">idle</span></div>
+      <div class="panel-body stages" id="stages"></div>
+    </section>
+
+    <section class="panel intel">
+      <div class="map-wrap"><svg id="miniMap" viewBox="0 0 320 170" role="img" aria-label="Trajectory map"></svg></div>
+      <div class="objects" id="objects"></div>
+    </section>
+  </aside>
+
+  <section class="log">
+    <pre class="console" id="console"></pre>
+    <div class="metrics">
+      <div class="metric"><span class="value" id="mFrames">0</span><span class="label">RGB frames</span></div>
+      <div class="metric"><span class="value" id="mDetFrames">0</span><span class="label">YOLO frames</span></div>
+      <div class="metric"><span class="value" id="mAnalysis">0</span><span class="label">Depth frames</span></div>
+      <div class="metric"><span class="value" id="mObjects">0</span><span class="label">detections</span></div>
+      <div class="metric"><span class="value" id="mClasses">0</span><span class="label">classes</span></div>
+      <div class="metric"><span class="value" id="mDepth">--</span><span class="label">depth range</span></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const els = {
+  status: document.getElementById('runStatus'),
+  runId: document.getElementById('runId'),
+  stageName: document.getElementById('stageName'),
+  stages: document.getElementById('stages'),
+  image: document.getElementById('mainImage'),
+  overlay: document.getElementById('overlay'),
+  empty: document.getElementById('emptyState'),
+  frameReadout: document.getElementById('frameReadout'),
+  modeReadout: document.getElementById('modeReadout'),
+  scrubber: document.getElementById('scrubber'),
+  console: document.getElementById('console'),
+  miniMap: document.getElementById('miniMap'),
+  objects: document.getElementById('objects'),
+  start: document.getElementById('startRun'),
+  stop: document.getElementById('stopRun'),
+  autoplay: document.getElementById('autoplay'),
+  metrics: {
+    frames: document.getElementById('mFrames'),
+    detFrames: document.getElementById('mDetFrames'),
+    analysis: document.getElementById('mAnalysis'),
+    objects: document.getElementById('mObjects'),
+    classes: document.getElementById('mClasses'),
+    depth: document.getElementById('mDepth')
+  }
+};
+
+const app = {
+  status: null,
+  frames: [],
+  index: 0,
+  mode: 'rgb',
+  auto: true,
+  lastRunId: null
+};
+
+function stageLabel(key){
+  return {collect:'Habitat-Sim', detect:'YOLO-World', analyze:'Depth + FastSAM'}[key] || key;
+}
+
+async function postJSON(url, payload){
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload || {})
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+
+function modeUrl(frame){
+  if(!frame) return null;
+  if(app.mode === 'analysis') return frame.depth || frame.analysis || null;
+  if(app.mode === 'detection') return frame.detection ? frame.rgb : null;
+  return frame.rgb;
+}
+
+function latestRenderableIndex(frames){
+  for(let i = frames.length - 1; i >= 0; i--){
+    if(modeUrl(frames[i])) return i;
+  }
+  return 0;
+}
+
+function updateStatusBadge(status){
+  els.status.classList.remove('running','error');
+  if(status.error){
+    els.status.textContent = 'Error';
+    els.status.classList.add('error');
+  } else if(status.running){
+    els.status.textContent = 'Running';
+    els.status.classList.add('running');
+  } else if(status.stage === 'complete'){
+    els.status.textContent = 'Complete';
+  } else {
+    els.status.textContent = status.stage || 'Idle';
+  }
+}
+
+function renderStages(stageStatus){
+  els.stages.innerHTML = '';
+  ['collect','detect','analyze'].forEach(key => {
+    const state = stageStatus[key] || 'pending';
+    const row = document.createElement('div');
+    row.className = `stage ${state}`;
+    row.innerHTML = `<span class="dot"></span><span class="name">${stageLabel(key)}</span><span class="state">${state}</span>`;
+    els.stages.appendChild(row);
+  });
+}
+
+function renderScrubber(){
+  els.scrubber.innerHTML = '';
+  const total = Math.max(app.frames.length, 1);
+  for(let i = 0; i < total; i++){
+    const frame = app.frames[i];
+    const tick = document.createElement('button');
+    tick.type = 'button';
+    tick.className = 'tick';
+    if(frame?.rgb) tick.classList.add('has-rgb');
+    if(frame?.detection) tick.classList.add('has-det');
+    if(frame?.analysis) tick.classList.add('has-analysis');
+    if(i === app.index) tick.classList.add('current');
+    tick.title = frame ? frame.name : 'pending';
+    tick.addEventListener('click', () => {
+      app.index = i;
+      app.auto = false;
+      els.autoplay.classList.remove('active');
+      render();
+    });
+    els.scrubber.appendChild(tick);
+  }
+}
+
+function renderImage(){
+  const frame = app.frames[app.index];
+  const url = modeUrl(frame);
+  const pending = app.mode === 'analysis' ? 'Depth pending' : app.mode === 'detection' ? 'YOLO pending' : 'No active run';
+  els.empty.style.display = url ? 'none' : 'grid';
+  els.empty.textContent = frame ? `${pending} for ${frame.name}` : pending;
+  els.image.style.display = url ? 'block' : 'none';
+  if(url && els.image.src !== new URL(url, window.location.href).href){
+    els.image.src = url;
+  }
+  els.frameReadout.textContent = frame ? String(frame.index).padStart(4,'0') : '--';
+  els.modeReadout.textContent = app.mode === 'analysis' ? 'Depth' : app.mode === 'detection' ? 'YOLO' : 'RGB';
+}
+
+function drawOverlay(){
+  const canvas = els.overlay;
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, rect.width, rect.height);
+
+  const frame = app.frames[app.index];
+  if(!frame || app.mode !== 'detection' || !els.image.naturalWidth || !els.image.naturalHeight) return;
+
+  const naturalW = els.image.naturalWidth;
+  const naturalH = els.image.naturalHeight;
+  const scale = Math.min(rect.width / naturalW, rect.height / naturalH);
+  const drawW = naturalW * scale;
+  const drawH = naturalH * scale;
+  const offX = (rect.width - drawW) / 2;
+  const offY = (rect.height - drawH) / 2;
+
+  const detections = [...(frame.detections || [])].sort((a,b) => b.confidence - a.confidence).slice(0, 10);
+  ctx.lineWidth = 1.4;
+  ctx.font = '12px ui-monospace, SFMono-Regular, Menlo, monospace';
+  detections.forEach((det, i) => {
+    const [x1,y1,x2,y2] = det.bbox;
+    const x = offX + x1 * scale;
+    const y = offY + y1 * scale;
+    const w = (x2 - x1) * scale;
+    const h = (y2 - y1) * scale;
+    ctx.strokeStyle = i === 0 ? '#f3b74a' : 'rgba(85,214,194,.82)';
+    ctx.fillStyle = 'rgba(14,15,13,.68)';
+    ctx.strokeRect(x, y, w, h);
+    const label = `${det.class} ${Number(det.confidence).toFixed(2)}`;
+    const tw = ctx.measureText(label).width + 10;
+    ctx.fillRect(x, Math.max(0, y - 20), tw, 18);
+    ctx.fillStyle = i === 0 ? '#f3b74a' : '#55d6c2';
+    ctx.fillText(label, x + 5, Math.max(13, y - 7));
+  });
+}
+
+function renderObjects(){
+  const frame = app.frames[app.index];
+  const objects = frame?.objects?.length ? frame.objects : frame?.detections || [];
+  els.objects.innerHTML = '';
+  if(!objects.length){
+    els.objects.innerHTML = '<div class="object-row"><b>No objects yet</b><span>--</span></div>';
+    return;
+  }
+  objects.slice(0, 16).forEach(obj => {
+    const row = document.createElement('div');
+    row.className = 'object-row';
+    const depth = obj.depth?.mean != null ? `${Number(obj.depth.mean).toFixed(2)} m` : `${Number(obj.confidence || 0).toFixed(2)}`;
+    row.innerHTML = `<b>${obj.class || 'object'}</b><span>${depth}</span>`;
+    els.objects.appendChild(row);
+  });
+}
+
+function renderMap(){
+  const positions = app.status?.summary?.positions || [];
+  const width = 320;
+  const height = 170;
+  els.miniMap.innerHTML = '';
+  const bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  bg.setAttribute('width', width);
+  bg.setAttribute('height', height);
+  bg.setAttribute('fill', '#10110d');
+  els.miniMap.appendChild(bg);
+
+  if(!positions.length){
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x', 160);
+    text.setAttribute('y', 88);
+    text.setAttribute('fill', '#a9aa96');
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', '12');
+    text.textContent = 'trajectory pending';
+    els.miniMap.appendChild(text);
+    return;
+  }
+
+  const xs = positions.map(p => p[0]);
+  const zs = positions.map(p => p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minZ = Math.min(...zs), maxZ = Math.max(...zs);
+  const pad = 22;
+  const sx = x => pad + ((x - minX) / Math.max(maxX - minX, 1e-6)) * (width - pad * 2);
+  const sz = z => pad + ((z - minZ) / Math.max(maxZ - minZ, 1e-6)) * (height - pad * 2);
+  const d = positions.map((p,i) => `${i ? 'L' : 'M'} ${sx(p[0]).toFixed(1)} ${sz(p[1]).toFixed(1)}`).join(' ');
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#55d6c2');
+  path.setAttribute('stroke-width', '2');
+  path.setAttribute('stroke-linecap', 'round');
+  els.miniMap.appendChild(path);
+  positions.forEach((p,i) => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx', sx(p[0]));
+    c.setAttribute('cy', sz(p[1]));
+    c.setAttribute('r', i === app.index ? 5 : 2.5);
+    c.setAttribute('fill', i === app.index ? '#f3b74a' : '#96d66e');
+    els.miniMap.appendChild(c);
+  });
+}
+
+function renderMetrics(summary){
+  els.metrics.frames.textContent = summary.frameCount || 0;
+  els.metrics.detFrames.textContent = summary.detectionFrames || 0;
+  els.metrics.analysis.textContent = summary.analysisFrames || 0;
+  els.metrics.objects.textContent = summary.totalDetections || 0;
+  els.metrics.classes.textContent = summary.uniqueClasses || 0;
+  if(summary.depthMin != null && summary.depthMax != null){
+    els.metrics.depth.textContent = `${Number(summary.depthMin).toFixed(1)}-${Number(summary.depthMax).toFixed(1)}m`;
+  } else {
+    els.metrics.depth.textContent = '--';
+  }
+}
+
+function render(){
+  renderScrubber();
+  renderImage();
+  renderObjects();
+  renderMap();
+  drawOverlay();
+}
+
+async function poll(){
+  try{
+    const status = await fetch('/api/status', {cache:'no-store'}).then(r => r.json());
+    app.status = status;
+    app.frames = status.frames || [];
+    if(status.runId !== app.lastRunId){
+      app.lastRunId = status.runId;
+      app.index = 0;
+    }
+    if(app.auto && app.frames.length){
+      app.index = status.running ? latestRenderableIndex(app.frames) : Math.min(app.index, app.frames.length - 1);
+    }
+    updateStatusBadge(status);
+    renderStages(status.stageStatus || {});
+    renderMetrics(status.summary || {});
+    els.runId.textContent = status.runId || 'local';
+    els.stageName.textContent = status.stage || 'idle';
+    els.console.textContent = (status.log || []).join('\n');
+    els.console.scrollTop = els.console.scrollHeight;
+    render();
+  } catch(err){
+    els.status.textContent = 'Offline';
+    els.status.classList.add('error');
+    els.empty.textContent = 'Start scripts/live_demo_server.py';
+  }
+}
+
+els.start.addEventListener('click', async () => {
+  const payload = {
+    scene: document.getElementById('scene').value,
+    frames: Number(document.getElementById('frames').value),
+    analysisFrames: Number(document.getElementById('analysisFrames').value),
+    confidence: Number(document.getElementById('confidence').value),
+    resolution: document.getElementById('resolution').value,
+    device: document.getElementById('device').value
+  };
+  try{
+    await postJSON('/api/run', payload);
+    app.auto = true;
+    els.autoplay.classList.add('active');
+    await poll();
+  } catch(err){
+    els.console.textContent += `\nERROR: ${err.message}`;
+  }
+});
+
+els.stop.addEventListener('click', async () => {
+  try{ await postJSON('/api/stop', {}); }
+  catch(err){ els.console.textContent += `\nERROR: ${err.message}`; }
+});
+
+document.querySelectorAll('[data-mode]').forEach(button => {
+  button.addEventListener('click', () => {
+    app.mode = button.dataset.mode;
+    document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b === button));
+    if(app.auto) app.index = latestRenderableIndex(app.frames);
+    render();
+  });
+});
+
+els.autoplay.addEventListener('click', () => {
+  app.auto = !app.auto;
+  els.autoplay.classList.toggle('active', app.auto);
+});
+
+setInterval(() => {
+  if(!app.auto || app.status?.running || app.frames.length < 2) return;
+  app.index = (app.index + 1) % app.frames.length;
+  render();
+}, 900);
+
+els.image.addEventListener('load', drawOverlay);
+window.addEventListener('resize', drawOverlay);
+poll();
+setInterval(poll, 1000);
+</script>
+</body>
+</html>

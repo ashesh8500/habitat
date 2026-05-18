@@ -177,7 +177,7 @@ def _navmesh_waypoints(sim, num_waypoints: int, step_dist: float) -> List[np.nda
             0,
             (np.random.random() - 0.5) * 2,
         ])
-        if pathfinder.is_navigable(current):
+        if len(waypoints) < num_waypoints and pathfinder.is_navigable(current):
             waypoints.append(current.copy())
 
     return waypoints
