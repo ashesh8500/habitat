@@ -65,7 +65,7 @@ All metrics measured on HM3D scene `00800-TEEsavR23oF` — a 398 m² furnished r
   <img src="docs/assets/trajectory_walkthrough.gif" width="480" alt="Trajectory walkthrough">
 </p>
 
-**Figure 3.** 26-frame navmesh-constrained walkthrough. Agent at 1.5 m eye height, 90° HFOV, 640×480. Quaternion gaze toward next waypoint.
+**Figure 3.** 26-frame navmesh-constrained walkthrough. Camera at 1.5 m eye height, 90° HFOV, 640×480. Quaternion gaze toward next waypoint.
 
 ---
 
@@ -126,7 +126,7 @@ conda run -n habitat-sim python -m habitat_sim.utils.datasets_download \
 
 | Constraint | Mitigation |
 |---|---|
-| Depth Pro: 5–10 s/frame on CPU | Batch overnight; evaluate MPS acceleration |
+| Depth Pro: 5–10 s/frame on CPU | Offline batch processing; evaluate MPS backend for Apple Silicon |
 | FastSAM 640 px resize causes mask artifacts | Bilinear interpolation upgrade |
 | No temporal object identity across frames | Hungarian matching + Kalman filtering |
 | Textureless surfaces → near-zero detections | Expected for geometric test scenes; HM3D provides full texture coverage |

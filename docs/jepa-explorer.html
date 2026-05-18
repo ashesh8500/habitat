@@ -3,280 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>JEPA Explorer · Habitat Spatial Reasoning</title>
+<title>JEPA Extension · Habitat Spatial Reasoning</title>
 <style>
   @font-face{font-family:'CMU Serif';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-400-normal.woff2) format('woff2');font-weight:400}
   @font-face{font-family:'CMU Serif';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-700-normal.woff2) format('woff2');font-weight:700}
   @font-face{font-family:'CMU Serif';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-400-italic.woff2) format('woff2');font-weight:400;font-style:italic}
   @font-face{font-family:'CMU Typewriter';src:url(https://cdn.jsdelivr.net/npm/@fontsource/computer-modern@4.5.0/files/computer-modern-typewriter-400-normal.woff2) format('woff2');font-weight:400}
 
-  :root{
-    --paper:#faf8f5; --ink:#1a1a1a; --muted:#68635d; --faint:#918a80;
-    --line:#d7d0c5; --line-strong:#a79e92; --panel:#f1eee8; --panel-2:#ebe6dd;
-    --accent:#2563eb; --accent-soft:#dce7ff; --good:#176b3a; --warn:#9a5a00; --bad:#9f2f2f;
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{font-size:11pt}
+  body{
+    font-family:'CMU Serif','Latin Modern Roman',Georgia,'Times New Roman',serif;
+    background:#faf8f5;color:#1a1a1a;line-height:1.5;
+    max-width:36em;margin:0 auto;padding:3em 1.5em 6em;
   }
-  *{box-sizing:border-box}
-  html{font-size:11.5pt;scroll-behavior:smooth}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:'CMU Serif','Latin Modern Roman',Georgia,'Times New Roman',serif;line-height:1.5}
-  .page{max-width:76rem;margin:0 auto;padding:2.2rem 1.2rem 5rem;display:grid;grid-template-columns:14rem minmax(0,1fr);gap:2rem}
-  aside{position:sticky;top:1.2rem;align-self:start;border-right:.5pt solid var(--line);padding-right:1rem;max-height:calc(100vh - 2.4rem);overflow:auto}
-  main{max-width:56rem}
-  .brand{font-size:.95rem;margin-bottom:1rem;color:var(--muted)}
-  nav a{display:block;color:var(--ink);text-decoration:none;padding:.35rem 0;border-bottom:.5pt solid transparent;font-size:.93rem}
-  nav a:hover,nav a.active{color:var(--accent);border-bottom-color:var(--line)}
-  h1{font-size:2.1rem;line-height:1.08;font-weight:400;margin:.2rem 0 .45rem;letter-spacing:-.02em}
-  h2{font-size:1.28rem;font-weight:400;margin:3rem 0 .8rem;padding-top:1rem;border-top:.5pt solid var(--line-strong)}
-  h3{font-size:1.05rem;font-weight:400;margin:1.4rem 0 .5rem}
-  p{margin:.2rem 0 .85rem;text-align:justify;hyphens:auto}
-  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+
+  h1{font-size:1.4em;font-weight:400;margin:0 0 .15em}
+  h2{font-size:1.1em;font-weight:400;margin:2.2em 0 .5em;padding-top:1em;border-top:.5pt solid #ccc}
+  h3{font-size:1em;font-weight:400;margin:1.5em 0 .4em}
+  p{margin:0 0 .85em;text-align:justify;hyphens:auto}
+  .subtitle{font-style:italic;margin-bottom:.15em}
+  .meta{font-size:.85em;color:#777;margin-bottom:2.5em}
+
+  a{color:#2563eb;text-decoration:none}
+  a:hover{text-decoration:underline}
+
   code,.mono{font-family:'CMU Typewriter','Latin Modern Mono','Courier New',monospace;font-size:.92em}
-  .subtitle{font-size:1.08rem;font-style:italic;color:var(--muted);max-width:46rem;text-align:left}
-  .meta{font-size:.86rem;color:var(--faint);margin:1.1rem 0 1.7rem}
-  .summary{display:grid;grid-template-columns:repeat(4,1fr);border:.5pt solid var(--line);margin:1.4rem 0 1.8rem;background:var(--panel)}
-  .summary div{padding:.75rem .65rem;border-right:.5pt solid var(--line);min-height:4.4rem}.summary div:last-child{border-right:0}
-  .summary b{display:block;font-size:1.16rem;font-weight:400}.summary span{display:block;color:var(--muted);font-size:.82rem;margin-top:.1rem}
-  figure{margin:1.8rem 0} figcaption{font-size:.88rem;color:var(--muted);font-style:italic;margin-top:.55rem}
-  .panel{background:var(--panel);border:.5pt solid var(--line);padding:1rem;margin:1rem 0}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-  .note{border-left:2pt solid var(--accent);padding:.65rem .8rem;background:rgba(37,99,235,.055);margin:1rem 0;color:#222;text-align:left}
-  .verdict{font-size:1.04rem;background:#fffaf0;border:.5pt solid #d8bc85;padding:.85rem 1rem;margin:1rem 0}
-  .caption{font-size:.86rem;color:var(--muted);text-align:left}
-  table{width:100%;border-collapse:collapse;margin:.8rem 0 1.2rem;font-size:.9rem}th{text-align:left;font-weight:400;border-bottom:.5pt solid var(--line-strong);padding:.35rem .4rem;color:var(--muted)}td{padding:.36rem .4rem;border-bottom:.5pt solid var(--line)}td.n{font-family:'CMU Typewriter';color:var(--accent)}
-  button{font-family:inherit;font-size:.92rem;background:transparent;color:var(--ink);border:.5pt solid var(--line-strong);padding:.42rem .62rem;cursor:pointer}button:hover{border-color:var(--accent);color:var(--accent)}button.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-  input[type=range]{accent-color:var(--accent);width:100%}.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:.8rem 0}.control label{display:block;font-size:.83rem;color:var(--muted);margin-bottom:.2rem}.readout{font-family:'CMU Typewriter';color:var(--accent)}
-  svg{width:100%;height:auto;display:block}.diagram text{font-family:'CMU Serif','Times New Roman',serif;fill:var(--ink)}.diagram .small{font-size:11px;fill:#5f5a53}.diagram .box{fill:#fbfaf7;stroke:#9f978d;stroke-width:1}.diagram .soft{fill:#f2efe9;stroke:#bcb4aa}.diagram .blue{fill:#eef4ff;stroke:#2563eb}.diagram .bad{fill:#fff1f1;stroke:#9f2f2f}.diagram .good{fill:#eef8f1;stroke:#176b3a}.diagram .arrow{stroke:#59544f;stroke-width:1.15;fill:none;marker-end:url(#arrow)}.diagram .dash{stroke-dasharray:4 3}
-  .tabs{display:flex;flex-wrap:wrap;gap:.45rem;margin:.75rem 0}.model-card{display:grid;grid-template-columns:1.2fr 1.8fr;gap:1rem;align-items:start}.metric-list{list-style:none;margin:0;padding:0}.metric-list li{display:grid;grid-template-columns:9rem 1fr;border-bottom:.5pt solid var(--line);padding:.32rem 0}.metric-list span:first-child{color:var(--muted)}
-  .matrix{display:grid;grid-template-columns:12rem repeat(5,1fr);border:.5pt solid var(--line);font-size:.86rem;margin:.9rem 0}.matrix>div{padding:.45rem;border-right:.5pt solid var(--line);border-bottom:.5pt solid var(--line);min-height:2.4rem}.matrix .head{background:var(--panel-2);color:var(--muted)}.matrix .ok{color:var(--good)}.matrix .partial{color:var(--warn)}.matrix .no{color:var(--bad)}
-  .bar-row{display:grid;grid-template-columns:8rem 1fr 4.5rem;gap:.6rem;align-items:center;margin:.4rem 0}.bar{height:.62rem;background:#e1dbd0;border:.5pt solid #c7bfb3}.bar i{display:block;height:100%;background:var(--accent);width:20%}.bar-row span:last-child{font-family:'CMU Typewriter';font-size:.85rem;color:var(--muted)}
-  .stage{cursor:pointer}.stage.selected .box,.stage.selected .blue,.stage.selected .soft{stroke:var(--accent);stroke-width:2}.hidden{display:none}.eq{font-family:'CMU Typewriter';font-size:.88rem;background:#fbfaf7;border:.5pt solid var(--line);padding:.55rem;overflow:auto}.footer{margin-top:3rem;padding-top:1rem;border-top:.5pt solid var(--line);color:var(--muted);font-size:.9rem}
-  @media(max-width:900px){.page{display:block;padding:1.2rem 1rem 4rem}aside{position:relative;top:auto;border-right:0;border-bottom:.5pt solid var(--line);padding:0 0 1rem;margin-bottom:1rem}.summary,.grid-2,.grid-3,.controls,.model-card{grid-template-columns:1fr}.matrix{grid-template-columns:8rem repeat(5,8rem);overflow:auto}nav{columns:2}}
+  pre{background:#f0ede8;border:.5pt solid #d4cfc4;border-radius:2px;padding:.8em 1em;overflow-x:auto;font-size:.85em;line-height:1.45;margin:.8em 0;font-family:'CMU Typewriter','Latin Modern Mono',monospace}
+
+  figure{margin:2em 0}
+  figure svg{width:100%;display:block}
+  figcaption{font-size:.88em;color:#555;margin-top:.5em;line-height:1.45;font-style:italic}
+
+  table{width:100%;border-collapse:collapse;margin:.8em 0 1.5em;font-size:.92em}
+  th{text-align:left;font-weight:400;border-bottom:.5pt solid #999;padding:.35em .4em .4em;font-size:.85em;color:#555}
+  td{padding:.3em .4em;border-bottom:.5pt solid #e3ded5}
+  td.n{font-family:'CMU Typewriter','Latin Modern Mono',monospace;color:#2563eb}
+  td.ok{color:#176b3a}
+  td.partial{color:#9a5a00}
+  td.no{color:#9f2f2f}
+
+  .refs{font-size:.9em;line-height:2;margin-top:2.5em;padding-top:1em;border-top:.5pt solid #ccc;color:#555}
+
+  svg text{font-family:'CMU Serif','Times New Roman',serif;fill:#1a1a1a}
+  svg .small{font-size:11px;fill:#555}
+  svg .box{fill:#fbfaf7;stroke:#888;stroke-width:.7}
+  svg .blue{fill:#eef4ff;stroke:#2563eb;stroke-width:.7}
+  svg .soft{fill:#f2efe9;stroke:#aaa;stroke-width:.7}
+  svg .bad{fill:#fff1f1;stroke:#9f2f2f;stroke-width:.7}
+  svg .good{fill:#eef8f1;stroke:#176b3a;stroke-width:.7}
+  svg .arrow{stroke:#59544f;stroke-width:1;fill:none;marker-end:url(#arrow)}
+  svg .dash{stroke-dasharray:4 3}
 </style>
 </head>
 <body>
-<div class="page">
-  <aside>
-    <div class="brand"><a href="index.html">← Habitat pipeline</a><br><span class="mono">JEPA explorer</span></div>
-    <nav id="nav">
-      <a href="#thesis">Thesis</a>
-      <a href="#baseline">Baseline</a>
-      <a href="#jepa">What JEPA gives</a>
-      <a href="#models">Model zoo</a>
-      <a href="#simulator">Probe simulator</a>
-      <a href="#plan">Experiment plan</a>
-      <a href="#decision">Decision</a>
-    </nav>
-  </aside>
 
-  <main>
-    <section id="thesis">
-      <h1>Can JEPA replace the spatial reasoning stack?</h1>
-      <p class="subtitle">A visual study page for exploring whether joint-embedding predictive models can substitute for YOLO-World, Depth Pro, and FastSAM in the Habitat/HM3D interview pipeline.</p>
-      <p class="meta">This is not a new implementation claim. It is a structured experiment design: what exists, what is missing, and what would be worth testing next.</p>
-      <div class="summary">
-        <div><b>No direct swap</b><span>JEPA weights output embeddings, not boxes, masks, or metric depth.</span></div>
-        <div><b>Good probe target</b><span>Frozen I-JEPA features can be tested for depth structure with a small decoder.</span></div>
-        <div><b>Best available weights</b><span><span class="mono">facebook/ijepa_vith16_1k</span> and JEPA-WM DROID.</span></div>
-        <div><b>Viable extension</b><span>Useful as a research experiment, not as a baseline replacement.</span></div>
-      </div>
-      <div class="verdict"><strong>Practical conclusion.</strong> Keep the current pipeline as the verified baseline. Add a JEPA branch that learns probes from frozen representations and compare against Depth Pro / YOLO-World outputs. That gives a credible, controlled experiment without weakening the task deliverable.</div>
-    </section>
+<h1>JEPA as a spatial representation substitute</h1>
+<p class="subtitle">Assessing whether joint-embedding predictive architectures can replace specialist models in the HM3D perception pipeline.</p>
+<p class="meta"><a href="index.html">← Habitat pipeline</a> · NYU WIRELESS · Summer 2026</p>
 
-    <section id="baseline">
-      <h2>1. The baseline produces explicit scene measurements</h2>
-      <p>The existing repository already solves the interview task using specialist models. Each model returns an artifact that is immediately measurable: a bounding box, a mask, or a metric depth value. JEPA models are different: their native output is a latent representation.</p>
-      <figure>
-        <svg class="diagram" viewBox="0 0 900 310" role="img" aria-label="Baseline pipeline versus JEPA branch">
-          <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#59544f"/></marker></defs>
-          <rect x="20" y="35" width="145" height="55" class="box"/><text x="92" y="58" text-anchor="middle">Habitat-Sim</text><text x="92" y="76" text-anchor="middle" class="small">RGB trajectory + poses</text>
-          <path d="M165 62 H225" class="arrow"/>
-          <g class="stage selected" data-stage="yolo"><rect x="225" y="20" width="145" height="55" class="blue"/><text x="298" y="43" text-anchor="middle">YOLO-World</text><text x="298" y="61" text-anchor="middle" class="small">boxes + labels</text></g>
-          <g class="stage" data-stage="depth"><rect x="225" y="95" width="145" height="55" class="blue"/><text x="298" y="118" text-anchor="middle">Depth Pro</text><text x="298" y="136" text-anchor="middle" class="small">metric depth map</text></g>
-          <g class="stage" data-stage="sam"><rect x="225" y="170" width="145" height="55" class="blue"/><text x="298" y="193" text-anchor="middle">FastSAM</text><text x="298" y="211" text-anchor="middle" class="small">object masks</text></g>
-          <path d="M370 48 H455" class="arrow"/><path d="M370 123 H455" class="arrow"/><path d="M370 198 H455" class="arrow"/>
-          <rect x="455" y="80" width="160" height="85" class="good"/><text x="535" y="110" text-anchor="middle">Spatial analysis</text><text x="535" y="130" text-anchor="middle" class="small">per-object depth</text><text x="535" y="148" text-anchor="middle" class="small">JSON + visualizations</text>
-          <path d="M615 123 H685" class="arrow"/>
-          <rect x="685" y="70" width="175" height="105" class="box"/><text x="773" y="100" text-anchor="middle">Interview answer</text><text x="773" y="120" text-anchor="middle" class="small">explicit object locations</text><text x="773" y="138" text-anchor="middle" class="small">distance statistics</text><text x="773" y="156" text-anchor="middle" class="small">verified on HM3D</text>
-          <path d="M165 260 H225" class="arrow dash"/><rect x="225" y="235" width="145" height="55" class="soft"/><text x="298" y="258" text-anchor="middle">JEPA encoder</text><text x="298" y="276" text-anchor="middle" class="small">latent patches only</text><path d="M370 263 H455" class="arrow dash"/><rect x="455" y="235" width="160" height="55" class="bad"/><text x="535" y="258" text-anchor="middle">Missing head</text><text x="535" y="276" text-anchor="middle" class="small">must train probe</text>
-        </svg>
-        <figcaption><strong>Figure 1.</strong> Click the specialist stages to inspect what each output gives the downstream analysis. The dashed JEPA branch shows the missing component: task-specific readout heads.</figcaption>
-      </figure>
-      <div id="stageText" class="note">YOLO-World is the open-vocabulary detector: it turns a prompt vocabulary into boxes, labels, and confidences. A bare JEPA encoder does not provide this interface.</div>
-    </section>
+<h2>1. Baseline overview</h2>
 
-    <section id="jepa">
-      <h2>2. JEPA is useful because the representation is spatial, not because it is already a detector</h2>
-      <p>In I-JEPA, the model receives visible context patches and predicts the representation of hidden target patches. The prediction happens in embedding space. This tends to preserve semantic layout while discarding pixel-level texture. For this project, the useful question is: does that representation contain enough information to recover depth and object layout?</p>
-      <figure>
-        <svg class="diagram" viewBox="0 0 900 330" role="img" aria-label="JEPA latent prediction diagram">
-          <defs><marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#59544f"/></marker></defs>
-          <rect x="25" y="35" width="190" height="190" class="box"/>
-          <g id="patchGrid"></g>
-          <text x="120" y="255" text-anchor="middle" class="small">masked image patches</text>
-          <path d="M215 130 H285" class="arrow" marker-end="url(#arrow2)"/>
-          <rect x="285" y="80" width="150" height="90" class="blue"/><text x="360" y="112" text-anchor="middle">Context encoder</text><text x="360" y="133" text-anchor="middle" class="small">ViT patch tokens</text><text x="360" y="151" text-anchor="middle" class="small">no labels</text>
-          <path d="M435 125 H505" class="arrow" marker-end="url(#arrow2)"/>
-          <rect x="505" y="80" width="150" height="90" class="soft"/><text x="580" y="112" text-anchor="middle">Predictor</text><text x="580" y="133" text-anchor="middle" class="small">target token estimates</text><text x="580" y="151" text-anchor="middle" class="small">latent-space loss</text>
-          <path d="M655 125 H725" class="arrow" marker-end="url(#arrow2)"/>
-          <rect x="725" y="80" width="150" height="90" class="good"/><text x="800" y="112" text-anchor="middle">Embedding field</text><text x="800" y="133" text-anchor="middle" class="small">28 × 28 × 1280</text><text x="800" y="151" text-anchor="middle" class="small">for ViT-H/16 @ 448</text>
-          <path d="M800 170 V230" class="arrow" marker-end="url(#arrow2)"/><rect x="670" y="230" width="260" height="70" class="box"/><text x="800" y="255" text-anchor="middle">Probe / decoder</text><text x="800" y="276" text-anchor="middle" class="small">the part this project must add</text>
-        </svg>
-        <figcaption><strong>Figure 2.</strong> The representation is dense enough to attach probes. But the probe is not included in public I-JEPA weights.</figcaption>
-      </figure>
-      <div class="eq">fθ(image) → z ∈ ℝ<sup>28×28×1280</sup>; &nbsp; gφ(z) → depth or objectness. &nbsp; Train φ, keep θ frozen.</div>
-    </section>
+<p>The existing pipeline uses three specialist models, each producing an explicit, directly measurable output: YOLO-World returns bounding boxes with class labels, Depth Pro returns a metric depth map in meters, and FastSAM returns per-object instance masks. These artifacts feed into a spatial analysis stage that computes per-object depth statistics, producing structured JSON and side-by-side visualizations.</p>
 
-    <section id="models">
-      <h2>3. Existing weights worth exploring</h2>
-      <p>The useful pretrained options fall into two groups: image encoders for static probes, and world models for temporal/spatial prediction. The tabs below summarize how each candidate fits this repository.</p>
-      <div class="tabs" id="modelTabs"></div>
-      <div class="panel model-card">
-        <div>
-          <h3 id="modelName">I-JEPA ViT-H/16</h3>
-          <p id="modelDesc" class="caption"></p>
-        </div>
-        <ul class="metric-list" id="modelFacts"></ul>
-      </div>
-      <div class="matrix" aria-label="Capability matrix">
-        <div class="head">Native output</div><div class="head">YOLO-World</div><div class="head">Depth Pro</div><div class="head">FastSAM</div><div class="head">I-JEPA</div><div class="head">JEPA-WM</div>
-        <div>Object labels</div><div class="ok">yes</div><div class="no">no</div><div class="no">no</div><div class="no">no</div><div class="no">no</div>
-        <div>Boxes</div><div class="ok">yes</div><div class="no">no</div><div class="partial">prompted masks</div><div class="no">probe needed</div><div class="no">probe needed</div>
-        <div>Masks</div><div class="partial">boxes only</div><div class="no">no</div><div class="ok">yes</div><div class="no">probe needed</div><div class="no">probe needed</div>
-        <div>Metric depth</div><div class="no">no</div><div class="ok">yes</div><div class="no">no</div><div class="partial">decoder needed</div><div class="partial">decoder needed</div>
-        <div>Future-state prediction</div><div class="no">no</div><div class="no">no</div><div class="no">no</div><div class="partial">static only</div><div class="ok">yes</div>
-      </div>
-    </section>
+<figure>
+  <svg viewBox="0 0 900 190" role="img" aria-label="Baseline pipeline diagram">
+    <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#59544f"/></marker></defs>
+    <rect x="20" y="50" width="130" height="55" class="box"/><text x="85" y="73" text-anchor="middle">Habitat-Sim</text><text x="85" y="91" text-anchor="middle" class="small">RGB + poses</text>
+    <path d="M150 78 H210" class="arrow"/>
+    <rect x="210" y="20" width="140" height="50" class="blue"/><text x="280" y="42" text-anchor="middle">YOLO-World</text><text x="280" y="58" text-anchor="middle" class="small">boxes + labels</text>
+    <rect x="210" y="85" width="140" height="50" class="blue"/><text x="280" y="107" text-anchor="middle">Depth Pro</text><text x="280" y="123" text-anchor="middle" class="small">metric depth</text>
+    <rect x="210" y="150" width="140" height="50" class="blue"/><text x="280" y="172" text-anchor="middle">FastSAM</text><text x="280" y="188" text-anchor="middle" class="small">object masks</text>
+    <path d="M350 45 H430" class="arrow"/><path d="M350 110 H430" class="arrow"/><path d="M350 175 H430" class="arrow"/>
+    <rect x="430" y="70" width="155" height="80" class="good"/><text x="508" y="95" text-anchor="middle">Spatial analysis</text><text x="508" y="116" text-anchor="middle" class="small">per-object depth</text><text x="508" y="134" text-anchor="middle" class="small">JSON + visualizations</text>
+    <path d="M585 110 H655" class="arrow"/>
+    <rect x="655" y="80" width="170" height="60" class="box"/><text x="740" y="105" text-anchor="middle">Pipeline output</text><text x="740" y="123" text-anchor="middle" class="small">verified on HM3D minival</text>
+  </svg>
+  <figcaption><strong>Figure 1.</strong> The current three-stage specialist pipeline. Each model produces a directly inspectable artifact.</figcaption>
+</figure>
 
-    <section id="simulator">
-      <h2>4. Probe simulator: how much supervision does a JEPA branch need?</h2>
-      <p>This small interactive model estimates qualitative viability. It is not a benchmark result; it encodes the experiment logic: more HM3D frames and a larger probe improve recoverability, but domain gap and the lack of labels limit how much a frozen representation can replace specialist models.</p>
-      <div class="panel">
-        <div class="controls">
-          <div class="control"><label>Training frames: <span id="framesV" class="readout">260</span></label><input id="frames" type="range" min="26" max="2600" step="26" value="260"></div>
-          <div class="control"><label>Probe capacity: <span id="capV" class="readout">medium</span></label><input id="cap" type="range" min="1" max="3" step="1" value="2"></div>
-          <div class="control"><label>Domain match: <span id="domainV" class="readout">HM3D</span></label><input id="domain" type="range" min="1" max="3" step="1" value="2"></div>
-        </div>
-        <div class="grid-2">
-          <div>
-            <h3>Expected recoverability</h3>
-            <div class="bar-row"><span>Relative depth</span><div class="bar"><i id="bDepth"></i></div><span id="vDepth">—</span></div>
-            <div class="bar-row"><span>Metric scale</span><div class="bar"><i id="bMetric"></i></div><span id="vMetric">—</span></div>
-            <div class="bar-row"><span>Objectness</span><div class="bar"><i id="bObj"></i></div><span id="vObj">—</span></div>
-            <div class="bar-row"><span>Open vocab</span><div class="bar"><i id="bLang"></i></div><span id="vLang">—</span></div>
-          </div>
-          <div>
-            <h3>Interpretation</h3>
-            <p id="simText" class="caption"></p>
-            <p class="caption"><strong>Reading rule:</strong> high relative depth with low open-vocabulary score means JEPA can plausibly replace the depth module after training, but not the detector.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+<h2>2. What JEPA provides</h2>
 
-    <section id="plan">
-      <h2>5. A controlled experiment that would be worth implementing</h2>
-      <p>The cleanest next step is to avoid overclaiming. Use the verified pipeline to generate pseudo-labels, then measure whether frozen JEPA features can recover those labels with small trainable heads.</p>
-      <figure>
-        <svg class="diagram" viewBox="0 0 900 360" role="img" aria-label="JEPA experiment plan">
-          <defs><marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#59544f"/></marker></defs>
-          <rect x="25" y="45" width="135" height="55" class="box"/><text x="92" y="68" text-anchor="middle">HM3D frames</text><text x="92" y="86" text-anchor="middle" class="small">RGB + poses</text>
-          <path d="M160 72 H220" class="arrow" marker-end="url(#arrow3)"/><rect x="220" y="25" width="145" height="55" class="blue"/><text x="293" y="48" text-anchor="middle">Depth Pro</text><text x="293" y="66" text-anchor="middle" class="small">teacher depth</text>
-          <path d="M160 72 C190 130,190 160,220 190" class="arrow" marker-end="url(#arrow3)"/><rect x="220" y="160" width="145" height="55" class="soft"/><text x="293" y="183" text-anchor="middle">I-JEPA</text><text x="293" y="201" text-anchor="middle" class="small">frozen features</text>
-          <path d="M365 188 H430" class="arrow" marker-end="url(#arrow3)"/><rect x="430" y="160" width="150" height="55" class="box"/><text x="505" y="183" text-anchor="middle">Depth head</text><text x="505" y="201" text-anchor="middle" class="small">train only this</text>
-          <path d="M365 53 C440 58,450 105,505 160" class="arrow dash" marker-end="url(#arrow3)"/><text x="458" y="88" class="small">loss</text>
-          <path d="M580 188 H645" class="arrow" marker-end="url(#arrow3)"/><rect x="645" y="125" width="205" height="125" class="good"/><text x="748" y="153" text-anchor="middle">Evaluation</text><text x="748" y="177" text-anchor="middle" class="small">AbsRel / RMSE vs teacher</text><text x="748" y="197" text-anchor="middle" class="small">per-object depth after masks</text><text x="748" y="217" text-anchor="middle" class="small">runtime + memory</text><text x="748" y="237" text-anchor="middle" class="small">failure-case visual grid</text>
-          <rect x="80" y="275" width="740" height="48" class="box"/><text x="450" y="304" text-anchor="middle">If good: repeat with YOLO boxes as objectness targets. If weak: use JEPA only as an auxiliary feature branch.</text>
-        </svg>
-        <figcaption><strong>Figure 3.</strong> Recommended first experiment. The baseline pipeline becomes the teacher, not the thing to throw away.</figcaption>
-      </figure>
-      <table>
-        <thead><tr><th>Experiment</th><th>Trainable part</th><th>Target</th><th>Success criterion</th></tr></thead>
-        <tbody>
-          <tr><td>I-JEPA depth probe</td><td>small decoder</td><td>Depth Pro map</td><td>Preserves object-depth ordering and low per-object error.</td></tr>
-          <tr><td>I-JEPA objectness probe</td><td>linear/MLP head</td><td>YOLO boxes or masks</td><td>Finds common objects but not necessarily open vocabulary labels.</td></tr>
-          <tr><td>JEPA-WM trajectory probe</td><td>none or small adapter</td><td>pose-conditioned frame transition</td><td>Embedding distance follows physical/camera motion.</td></tr>
-        </tbody>
-      </table>
-    </section>
+<p>Joint-embedding predictive architectures (I-JEPA, V-JEPA, JEPA-WM) learn representations by predicting hidden patch embeddings from visible context. Their native output is a latent embedding field — not bounding boxes, not class labels, not metric depth, and not instance masks. The key question is whether these representations contain sufficient spatial structure to recover the same measurements through learned readout heads.</p>
 
-    <section id="decision">
-      <h2>6. Decision guide</h2>
-      <div class="grid-3">
-        <div class="panel"><h3>Do now</h3><p>Build <span class="mono">scripts/jepa_depth_probe.py</span>. Freeze I-JEPA, train a small decoder on HM3D frames with Depth Pro pseudo-labels, and compare per-object depth statistics.</p></div>
-        <div class="panel"><h3>Do next</h3><p>Try JEPA-WM DROID embeddings on consecutive Habitat frames. Test whether latent distance tracks camera translation and rotation from the simulator metadata.</p></div>
-        <div class="panel"><h3>Do not claim</h3><p>Do not say JEPA replaces the full perception stack until a trained head returns boxes, masks, labels, and depth at comparable quality.</p></div>
-      </div>
-      <div class="note"><strong>Bottom line.</strong> JEPA is viable as an experimental branch for representation-based spatial reasoning. It is not currently a drop-in substitute for the specialist baseline. That distinction is the strongest way to present the idea.</div>
-    </section>
+<p>In I-JEPA (Assran et al., 2023), the context encoder processes visible image patches and a predictor estimates the representation of masked target patches. The loss operates in embedding space, which tends to preserve semantic layout while discarding pixel-level texture. For this project, the relevant question is: does that representation contain enough information to recover depth ordering and object layout?</p>
 
-    <div class="footer">Built for the Habitat Spatial Reasoning repository. Local artifact: <span class="mono">docs/jepa-explorer.html</span>.</div>
-  </main>
+<figure>
+  <svg viewBox="0 0 900 300" role="img" aria-label="JEPA latent prediction diagram">
+    <defs><marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#59544f"/></marker></defs>
+    <rect x="25" y="55" width="170" height="160" class="box"/>
+    <!-- simplified patch grid -->
+    <rect x="40" y="70" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="58" y="70" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="76" y="70" width="17" height="17" fill="#dce7ff" stroke="#2563eb" stroke-width=".7"/>
+    <rect x="94" y="70" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="40" y="88" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="58" y="88" width="17" height="17" fill="#dce7ff" stroke="#2563eb" stroke-width=".7"/>
+    <rect x="76" y="88" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="94" y="88" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="40" y="106" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="58" y="106" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="76" y="106" width="17" height="17" fill="#f5f1ea" stroke="#bdb4a8" stroke-width=".7"/>
+    <rect x="94" y="106" width="17" height="17" fill="#dce7ff" stroke="#2563eb" stroke-width=".7"/>
+    <text x="110" y="250" text-anchor="middle" class="small">masked image patches</text>
+    <path d="M195 135 H260" class="arrow"/>
+    <rect x="260" y="95" width="140" height="80" class="blue"/><text x="330" y="125" text-anchor="middle">Context encoder</text><text x="330" y="145" text-anchor="middle" class="small">ViT patch tokens</text>
+    <path d="M400 135 H470" class="arrow"/>
+    <rect x="470" y="95" width="140" height="80" class="soft"/><text x="540" y="125" text-anchor="middle">Predictor</text><text x="540" y="145" text-anchor="middle" class="small">embedding-space loss</text>
+    <path d="M610 135 H680" class="arrow"/>
+    <rect x="680" y="95" width="160" height="80" class="good"/><text x="760" y="125" text-anchor="middle">Embedding field</text><text x="760" y="145" text-anchor="middle" class="small">28 × 28 × 1280 (ViT-H/16 @ 448)</text>
+    <path d="M760 175 V240" class="arrow"/><rect x="640" y="240" width="240" height="55" class="box"/><text x="760" y="263" text-anchor="middle">Probe / decoder (must be trained)</text><text x="760" y="281" text-anchor="middle" class="small">not included in public I-JEPA weights</text>
+  </svg>
+  <figcaption><strong>Figure 2.</strong> The I-JEPA representation pathway. <em>f</em><sub>θ</sub>(·) → z ∈ ℝ<sup>28×28×1280</sup>. A readout head <em>g</em><sub>φ</sub>(z) must be trained to decode depth, objectness, or other task-specific quantities from the frozen embedding field.</figcaption>
+</figure>
+
+<h2>3. Capability comparison</h2>
+
+<p>Each specialist model in the baseline provides a specific interface. The table below compares native capabilities without additional training.</p>
+
+<table>
+  <tr><th>Native output</th><th>YOLO-World</th><th>Depth Pro</th><th>FastSAM</th><th>I-JEPA</th><th>JEPA-WM</th></tr>
+  <tr><td>Object labels</td><td class="ok">yes</td><td class="no">no</td><td class="no">no</td><td class="no">no</td><td class="no">no</td></tr>
+  <tr><td>Bounding boxes</td><td class="ok">yes</td><td class="no">no</td><td class="partial">prompted</td><td class="no">probe needed</td><td class="no">probe needed</td></tr>
+  <tr><td>Instance masks</td><td class="partial">boxes only</td><td class="no">no</td><td class="ok">yes</td><td class="no">probe needed</td><td class="no">probe needed</td></tr>
+  <tr><td>Metric depth</td><td class="no">no</td><td class="ok">yes</td><td class="no">no</td><td class="partial">decoder needed</td><td class="partial">decoder needed</td></tr>
+  <tr><td>Future-state prediction</td><td class="no">no</td><td class="no">no</td><td class="no">no</td><td class="partial">static only</td><td class="ok">yes</td></tr>
+</table>
+
+<p>No JEPA-family model provides object labels, boxes, masks, or metric depth out of the box. The most plausible substitution target is depth estimation, since Depth Pro pseudo-labels provide dense supervision and the spatial structure of the embedding field may support metric scale recovery with a lightweight decoder.</p>
+
+<h2>4. Candidate models</h2>
+
+<h3>I-JEPA ViT-H/16</h3>
+<p>The best first candidate. It is a static image encoder with a HuggingFace checkpoint (<code>facebook/ijepa_vith16_1k</code>) at 448 × 448 native resolution, producing a 28 × 28 × 1280 embedding field. At ~0.6B parameters, it is manageable for single-GPU probing experiments. A depth probe can be trained on HM3D frames supervised by Depth Pro outputs, with evaluation on per-object depth statistics.</p>
+
+<h3>V-JEPA / V-JEPA 2</h3>
+<p>Video JEPA models encode spatiotemporal structure and may be useful for temporal consistency across trajectory frames. However, they are heavier to integrate and less directly applicable to the still-frame analysis required by the task. Checkpoints are available via <code>facebookresearch/jepa</code>.</p>
+
+<h3>JEPA-WM DROID</h3>
+<p>Conceptually the most aligned with egocentric spatial dynamics: it predicts future latent states from observations and actions. The DROID variant (<code>facebook/jepa-wms</code>, loaded via <code>torch.hub</code>) uses a DINOv3 ViT-L/16 encoder. Its action space is robotics-oriented, but the pose-conditioned prediction objective is a natural fit for trajectory data from Habitat-sim.</p>
+
+<h3>LeJEPA / Core-JEPA</h3>
+<p>Newer representation work, but the available public checkpoint (<code>gajeshladhar/core-jepa</code>) is trained on satellite imagery and has not been evaluated on indoor scenes. Domain mismatch makes this a lower-priority candidate.</p>
+
+<h2>5. Proposed experiment</h2>
+
+<p>The cleanest evaluation uses the verified baseline as a teacher and tests whether frozen JEPA features can recover its outputs with small trainable heads.</p>
+
+<figure>
+  <svg viewBox="0 0 900 310" role="img" aria-label="Proposed experiment diagram">
+    <defs><marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#59544f"/></marker></defs>
+    <rect x="25" y="65" width="125" height="50" class="box"/><text x="88" y="87" text-anchor="middle">HM3D frames</text><text x="88" y="103" text-anchor="middle" class="small">RGB + poses</text>
+    <path d="M150 90 H210" class="arrow"/>
+    <rect x="210" y="50" width="140" height="45" class="blue"/><text x="280" y="69" text-anchor="middle">Depth Pro</text><text x="280" y="85" text-anchor="middle" class="small">teacher depth</text>
+    <path d="M150 90 C185 160,185 190,210 210" class="arrow"/>
+    <rect x="210" y="185" width="140" height="45" class="soft"/><text x="280" y="204" text-anchor="middle">I-JEPA</text><text x="280" y="220" text-anchor="middle" class="small">frozen features</text>
+    <path d="M350 208 H420" class="arrow"/>
+    <rect x="420" y="185" width="135" height="45" class="box"/><text x="488" y="204" text-anchor="middle">Depth head φ</text><text x="488" y="220" text-anchor="middle" class="small">train only this</text>
+    <path d="M350 73 C425 78,435 115,488 185" class="arrow dash"/>
+    <text x="445" y="120" class="small">pseudo-label loss</text>
+    <path d="M555 208 H620" class="arrow"/>
+    <rect x="620" y="150" width="220" height="105" class="good"/><text x="730" y="178" text-anchor="middle">Evaluation</text><text x="730" y="198" text-anchor="middle" class="small">AbsRel / RMSE vs. Depth Pro</text><text x="730" y="216" text-anchor="middle" class="small">per-object depth ordering</text><text x="730" y="234" text-anchor="middle" class="small">runtime and memory profile</text>
+    <rect x="80" y="275" width="740" height="28" class="box"/><text x="450" y="293" text-anchor="middle" class="small">If depth recovery is strong: extend to objectness probe using YOLO boxes as targets. If weak: JEPA features remain an auxiliary branch, not a replacement.</text>
+  </svg>
+  <figcaption><strong>Figure 3.</strong> Proposed first experiment. The specialist baseline provides pseudo-labels for training; evaluation measures how well frozen JEPA features recover those labels through a small decoder.</figcaption>
+</figure>
+
+<table>
+  <tr><th>Experiment</th><th>Trainable</th><th>Target</th><th>Success criterion</th></tr>
+  <tr><td>I-JEPA depth probe</td><td class="n">small decoder</td><td>Depth Pro map</td><td>Preserves object-depth ordering, low per-object error</td></tr>
+  <tr><td>I-JEPA objectness probe</td><td class="n">linear/MLP head</td><td>YOLO boxes</td><td>Recovers common objects without open-vocab labels</td></tr>
+  <tr><td>JEPA-WM trajectory probe</td><td class="n">none or adapter</td><td>pose-conditioned transition</td><td>Embedding distance follows camera motion</td></tr>
+</table>
+
+<h2>6. Findings</h2>
+
+<p>JEPA-family models do not currently provide drop-in substitutes for the specialist detection, depth estimation, and segmentation stack. The native output is a latent representation, not the structured artifacts (boxes, labels, masks, metric depth) required for the spatial reasoning task. The baseline pipeline remains the verified solution for the task requirements.</p>
+
+<p>However, a controlled experiment — training small readout heads on frozen I-JEPA features supervised by Depth Pro pseudo-labels — could assess whether the learned representations contain recoverable depth structure. This would serve as a principled research extension demonstrating judgment about representation learning, rather than a claim of replacement. The experimental design above outlines a self-contained probe that can be implemented in a single additional script without modifying the existing pipeline.</p>
+
+<div class="refs">
+  <strong>References</strong><br>
+  Assran et al. <a href="https://arxiv.org/abs/2301.08243">Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture</a> (CVPR 2023) ·
+  Bardes et al. <a href="https://arxiv.org/abs/2312.11562">Revisiting Feature Prediction for Learning Visual Representations from Video</a> (2024) ·
+  <a href="https://github.com/facebookresearch/ijepa">I-JEPA</a> ·
+  <a href="https://github.com/facebookresearch/jepa">JEPA family</a> ·
+  <a href="index.html">Habitat pipeline</a>
 </div>
-<script>
-(function(){
-  var stageCopy={
-    yolo:'YOLO-World is the open-vocabulary detector: it turns a prompt vocabulary into boxes, labels, and confidences. A bare JEPA encoder does not provide this interface.',
-    depth:'Depth Pro gives a dense metric depth map in meters. This is the most plausible first replacement target for JEPA, because a decoder can be trained from patch features to depth.',
-    sam:'FastSAM converts detections into masks so object-depth statistics can be computed over pixels instead of bounding boxes. JEPA has no native mask head.'
-  };
-  document.querySelectorAll('.stage').forEach(function(g){
-    g.addEventListener('click',function(){
-      document.querySelectorAll('.stage').forEach(function(x){x.classList.remove('selected')});
-      g.classList.add('selected');
-      document.getElementById('stageText').textContent=stageCopy[g.dataset.stage];
-    });
-  });
 
-  var grid=document.getElementById('patchGrid');
-  if(grid){
-    for(var r=0;r<7;r++){for(var c=0;c<7;c++){
-      var rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-      rect.setAttribute('x',45+c*23);rect.setAttribute('y',55+r*23);rect.setAttribute('width',20);rect.setAttribute('height',20);
-      var masked=(r===1&&c>2)||(r===3&&c<3)||(r===5&&c>1&&c<5);
-      rect.setAttribute('fill',masked?'#dce7ff':'#f5f1ea');rect.setAttribute('stroke',masked?'#2563eb':'#bdb4a8');rect.setAttribute('stroke-width','1');
-      grid.appendChild(rect);
-    }}
-  }
-
-  var models=[
-    {id:'ijepa',name:'I-JEPA ViT-H/16',desc:'Best first choice for this repository. It is a static image encoder with HuggingFace Transformers support and a 448×448 native checkpoint.',facts:[['Weights','facebook/ijepa_vith16_1k'],['Native output','patch embeddings'],['Resolution','448×448 → 28×28 patches'],['Size','~0.6B params / 2.5GB'],['Use here','train depth probe']]},
-    {id:'vjepa',name:'V-JEPA / V-JEPA 2',desc:'Video JEPA models encode motion and physical change, but are heavier and less directly wired to this still-frame analysis pipeline.',facts:[['Weights','facebookresearch/jepa, vjepa2'],['Native output','spatiotemporal embeddings'],['Resolution','224–384 video clips'],['Use here','temporal consistency probe'],['Risk','heavier integration']]},
-    {id:'wm',name:'JEPA-WM DROID',desc:'Most conceptually aligned with egocentric spatial dynamics. It predicts future latent states from observations and actions, but its action space is robotics-oriented.',facts:[['Weights','facebook/jepa-wms'],['Load','torch.hub jepa_wm_droid'],['Encoder','DINOv3 ViT-L/16'],['Domain','DROID / RoboCasa'],['Use here','pose-conditioned trajectory probe']]},
-    {id:'lejepa',name:'LeJEPA / Core-JEPA',desc:'Interesting newer representation work, but the public model found is Earth-observation oriented, so it is less relevant for indoor HM3D perception.',facts:[['Weights','gajeshladhar/core-jepa'],['Domain','satellite imagery'],['Use here','not first choice'],['Reason','domain mismatch'],['Status','experimental']]}
-  ];
-  var tabs=document.getElementById('modelTabs'), facts=document.getElementById('modelFacts');
-  function renderModel(i){
-    var m=models[i];document.getElementById('modelName').textContent=m.name;document.getElementById('modelDesc').textContent=m.desc;facts.innerHTML='';
-    m.facts.forEach(function(pair){var li=document.createElement('li');li.innerHTML='<span>'+pair[0]+'</span><span class="mono">'+pair[1]+'</span>';facts.appendChild(li);});
-    Array.prototype.forEach.call(tabs.children,function(b,j){b.classList.toggle('active',j===i)});
-  }
-  models.forEach(function(m,i){var b=document.createElement('button');b.textContent=m.name;b.addEventListener('click',function(){renderModel(i)});tabs.appendChild(b);});renderModel(0);
-
-  function sim(){
-    var frames=+document.getElementById('frames').value, cap=+document.getElementById('cap').value, domain=+document.getElementById('domain').value;
-    document.getElementById('framesV').textContent=frames;
-    document.getElementById('capV').textContent=['small','medium','large'][cap-1];
-    document.getElementById('domainV').textContent=['robotics gap','HM3D','indoor fine-tune'][domain-1];
-    var log=Math.log(frames/26+1)/Math.log(101);
-    var capacity=[.72,1,1.15][cap-1], match=[.72,1,1.12][domain-1];
-    var depth=Math.min(92,28+52*log*capacity*match);
-    var metric=Math.min(78,18+44*log*capacity*match*.92);
-    var obj=Math.min(70,20+35*log*capacity*match);
-    var lang=Math.min(32,8+10*log+4*(domain-1));
-    [['Depth',depth],['Metric',metric],['Obj',obj],['Lang',lang]].forEach(function(x){document.getElementById('b'+x[0]).style.width=x[1].toFixed(0)+'%';document.getElementById('v'+x[0]).textContent=x[1].toFixed(0)+'%';});
-    var text=depth>70?'This setting is plausible for a JEPA depth probe. It may recover relative scene geometry well enough to compare per-object distances, especially if Depth Pro pseudo-labels are used for supervision.':'This setting is exploratory only. With little data or low domain match, the probe would mostly test whether the representation contains signal, not whether it can replace a specialist model.';
-    if(lang<25) text+=' Open-vocabulary labeling remains the weak point; keep YOLO-World unless a language-aligned head is trained.';
-    document.getElementById('simText').textContent=text;
-  }
-  ['frames','cap','domain'].forEach(function(id){document.getElementById(id).addEventListener('input',sim)});sim();
-
-  var sections=Array.prototype.slice.call(document.querySelectorAll('main section'));
-  var links=Array.prototype.slice.call(document.querySelectorAll('nav a'));
-  var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id);});}});},{rootMargin:'-25% 0px -65% 0px',threshold:0});
-  sections.forEach(function(s){obs.observe(s)});
-})();
-</script>
 </body>
 </html>

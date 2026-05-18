@@ -74,11 +74,11 @@
 
 <h2>1. Trajectory collection</h2>
 
-<p>HM3D minival scene <code>00800-TEEsavR23oF</code> (398 m², 2 floors, 7 rooms, furnished) is loaded into habitat-sim 0.3.3. An agent equipped with a pinhole RGB camera at 1.5 m eye height (90° HFOV, 640 × 480 resolution) navigates via navmesh-constrained waypoints using directional walk heuristics, covering 16.6 m × 7.7 m of walkable area. 26 frames are captured with per-frame position vectors and quaternion rotation metadata.</p>
+<p>HM3D minival scene <code>00800-TEEsavR23oF</code> (398 m², 2 floors, 7 rooms, furnished) is loaded into habitat-sim 0.3.3. A pinhole RGB camera at 1.5 m eye height (90° HFOV, 640 × 480 resolution) captures frames along navmesh-constrained waypoints using directional walk heuristics, covering 16.6 m × 7.7 m of walkable area. 26 frames are captured with per-frame position vectors and quaternion rotation metadata.</p>
 
 <figure>
   <img src="assets/trajectory_walkthrough.gif" alt="Trajectory animation">
-  <figcaption><strong>Figure 3.</strong> 26-frame navmesh-constrained walkthrough. The agent orients toward the next waypoint, producing first-person views while moving through the furnished residential interior.</figcaption>
+  <figcaption><strong>Figure 3.</strong> 26-frame navmesh-constrained walkthrough. The camera orients toward each successive waypoint, producing first-person views through the furnished residential interior.</figcaption>
 </figure>
 
 <h2>2. Object detection</h2>
@@ -149,7 +149,7 @@ python scripts/analyze_scene.py --max-frames 5</pre>
 
 <table>
   <tr><th>Constraint</th><th>Proposed mitigation</th></tr>
-  <tr><td>Depth Pro runs 5–10 s/frame on CPU</td><td>Batch overnight; evaluate MPS acceleration</td></tr>
+  <tr><td>Depth Pro runs 5–10 s/frame on CPU</td><td>Offline batch processing; evaluate MPS backend for Apple Silicon</td></tr>
   <tr><td>FastSAM internal 640 px resize causes mask edge artifacts</td><td>Upgrade to bilinear interpolation</td></tr>
   <tr><td>No temporal object identity across frames</td><td>Hungarian matching with Kalman filtering</td></tr>
   <tr><td>Textureless surfaces yield near-zero detections</td><td>Expected for geometric test scenes; HM3D is fully textured</td></tr>
